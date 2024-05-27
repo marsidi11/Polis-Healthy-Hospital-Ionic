@@ -1,0 +1,7 @@
+{
+  "name": "polis-healthy-hospital",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
