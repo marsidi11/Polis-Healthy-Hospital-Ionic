@@ -1,0 +1,16 @@
+{
+    "patients": [
+        {"id": 1, "name": "John Doe", "age": 30, "department": "Cardiology"},
+        {"id": 2, "name": "Jane Smith", "age": 40, "department": "Neurology"},
+        {"id": 3, "name": "Alice Johnson", "age": 50, "department": "Orthopedics"},
+        {"id": 4, "name": "Bob Williams", "age": 60, "department": "Radiology"},
+        {"id": 5, "name": "Charlie Brown", "age": 70, "department": "Gastroenterology"}
+    ],
+    "departments": [
+        {"id": 1, "name": "Cardiology"},
+        {"id": 2, "name": "Neurology"},
+        {"id": 3, "name": "Orthopedics"},
+        {"id": 4, "name": "Radiology"},
+        {"id": 5, "name": "Gastroenterology"}
+    ]
+}
