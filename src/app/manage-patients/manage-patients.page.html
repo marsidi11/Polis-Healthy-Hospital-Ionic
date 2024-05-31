@@ -5,18 +5,27 @@
 </ion-header>
 
 <ion-content>
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterPatients()"></ion-searchbar>
+
   <ion-grid>
     <ion-row class="header">
       <ion-col>ID</ion-col>
       <ion-col>Name</ion-col>
       <ion-col>Age</ion-col>
       <ion-col>Department</ion-col>
+      <ion-col>Actions</ion-col>
     </ion-row>
-    <ion-row *ngFor="let patient of patients">
+    <ion-row *ngFor="let patient of filteredPatients">
       <ion-col>{{patient.id}}</ion-col>
       <ion-col>{{patient.name}}</ion-col>
       <ion-col>{{patient.age}}</ion-col>
       <ion-col>{{patient.department}}</ion-col>
+      <ion-col>
+        <ion-button (click)="openEditModal(patient)">Edit</ion-button>
+        <ion-button color="danger" (click)="deletePatient(patient)">Delete</ion-button>
+        <ion-button expand="full" (click)="navigateToManageClinicalRecords(patient.id)">Manage Clinical Records</ion-button>
+        <ion-button expand="full" (click)="navigateToManageAdmissions(patient.id)">Manage Admissions</ion-button>
+      </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
