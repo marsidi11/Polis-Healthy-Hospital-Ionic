@@ -7,6 +7,8 @@
 <ion-content>
   <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterPatients()"></ion-searchbar>
 
+  <ion-button expand="block" (click)="openCreateModal()">Create Patient</ion-button>
+
   <ion-grid>
     <ion-row class="header">
       <ion-col>ID</ion-col>
@@ -23,8 +25,8 @@
       <ion-col>
         <ion-button (click)="openEditModal(patient)">Edit</ion-button>
         <ion-button color="danger" (click)="deletePatient(patient)">Delete</ion-button>
-        <ion-button expand="full" (click)="navigateToManageClinicalRecords(patient.id)">Manage Clinical Records</ion-button>
-        <ion-button expand="full" (click)="navigateToManageAdmissions(patient.id)">Manage Admissions</ion-button>
+        <ion-button expand="block" (click)="navigateToManageClinicalRecords(patient.id)">Manage Clinical Records</ion-button>
+        <ion-button expand="block" (click)="navigateToManageAdmissions(patient.id)">Manage Admissions</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

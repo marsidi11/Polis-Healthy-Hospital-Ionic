@@ -5,10 +5,8 @@
 </ion-header>
 
 <ion-content>
-  <ion-item>
-    <ion-label position="floating">Search</ion-label>
-    <ion-input [(ngModel)]="searchTerm" (ionInput)="filterDepartments()"></ion-input>
-  </ion-item>
+  
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterDepartments()"></ion-searchbar>
 
   <ion-button expand="block" (click)="openCreateModal()">Create Department</ion-button>
 
