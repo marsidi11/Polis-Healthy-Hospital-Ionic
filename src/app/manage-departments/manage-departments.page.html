@@ -5,23 +5,24 @@
 </ion-header>
 
 <ion-content>
-  
-  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterDepartments()"></ion-searchbar>
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterDepartments()" placeholder="Search Department" color="light"></ion-searchbar>
 
-  <ion-button expand="block" (click)="openCreateModal()">Create Department</ion-button>
+  <ion-button expand="block" (click)="openCreateModal()" color="secondary" class="create-button">
+    <ion-icon slot="start" name="add-circle-outline"></ion-icon> Create Department
+  </ion-button>
 
   <ion-grid>
     <ion-row class="header">
-      <ion-col>ID</ion-col>
-      <ion-col>Name</ion-col>
-      <ion-col>Actions</ion-col>
+      <ion-col class="header-col">ID</ion-col>
+      <ion-col class="header-col">Name</ion-col>
+      <ion-col class="header-col">Actions</ion-col>
     </ion-row>
-    <ion-row *ngFor="let department of filteredDepartments">
-      <ion-col>{{department.id}}</ion-col>
-      <ion-col>{{department.name}}</ion-col>
-      <ion-col>
-        <ion-button (click)="openEditModal(department)">Edit</ion-button>
-        <ion-button color="danger" (click)="deleteDepartment(department)">Delete</ion-button>
+    <ion-row *ngFor="let department of filteredDepartments" class="department-row">
+      <ion-col>{{ department.id }}</ion-col>
+      <ion-col>{{ department.name }}</ion-col>
+      <ion-col class="actions-col">
+        <ion-button fill="clear" color="tertiary" (click)="openEditModal(department)"  class="action-button">Edit</ion-button>
+        <ion-button fill="clear" color="danger" (click)="deleteDepartment(department)" class="action-button">Delete</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
