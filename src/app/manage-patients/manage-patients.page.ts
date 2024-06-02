@@ -125,6 +125,48 @@ export class ManagePatientsPage implements OnInit {
     await alert.present();
   }
 
+  async openDischargeModal(patient: Patient) {
+    const alert = await this.alertController.create({
+      header: 'Discharge Patient',
+      inputs: [
+        {
+          name: 'dischargeReason',
+          type: 'radio',
+          label: 'Healthy',
+          value: 'Healthy',
+          checked: true
+        },
+        {
+          name: 'dischargeReason',
+          type: 'radio',
+          label: 'Transfer',
+          value: 'Transfer'
+        },
+        {
+          name: 'dischargeReason',
+          type: 'radio',
+          label: 'Death',
+          value: 'Death'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Discharge',
+          handler: data => {
+            this.dischargePatient(patient.id, data.dischargeReason);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   createPatient(name: string, age: number, department: string) {
     const newPatient: Patient = { id: this.patients.length + 1, name, age, department };
     this.patientService.createPatient(newPatient).subscribe(patient => {
@@ -143,6 +185,16 @@ export class ManagePatientsPage implements OnInit {
         this.filterPatients(); // Refresh the filtered list
       });
     }
+  }
+
+  dischargePatient(id: number, dischargeReason: string) {
+    this.patientService.dischargePatient(id, dischargeReason).subscribe(() => {
+      const patient = this.patients.find(p => p.id === id);
+      if (patient) {
+        patient.department = ''; // Clear department to indicate discharge
+        this.filterPatients(); // Refresh the filtered list
+      }
+    });
   }
 
   async deletePatient(patient: Patient) {

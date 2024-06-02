@@ -29,6 +29,7 @@
         <ion-button fill="clear" color="danger" (click)="deletePatient(patient)">Delete</ion-button>
         <ion-button expand="block" (click)="navigateToManageClinicalRecords(patient.id)">Manage Clinical Records</ion-button>
         <ion-button expand="block" (click)="navigateToManageAdmissions(patient.id)">Manage Admissions</ion-button>
+        <ion-button expand="block" color="warning" (click)="openDischargeModal(patient)">Discharge</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

@@ -5,17 +5,21 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let admission of admissions">
-      <ion-label>
-        <h2>Admission Date: {{ admission.admissionDate }}</h2>
-        <p>Discharge Date: {{ admission.dischargeDate }}</p>
-        <p>Reason: {{ admission.reason }}</p>
-      </ion-label>
-      <ion-buttons slot="end">
-        <ion-button (click)="openEditModal(admission)">Edit</ion-button>
-        <ion-button color="danger" (click)="deleteAdmission(admission.id)">Delete</ion-button>
-      </ion-buttons>
-    </ion-item>
-  </ion-list>
+  <ion-grid>
+    <ion-row class="header">
+      <ion-col>Department</ion-col>
+      <ion-col>Actions</ion-col>
+    </ion-row>
+    <ion-row *ngFor="let department of departments">
+      <ion-col>{{department.name}}</ion-col>
+      <ion-col>
+        <ion-button *ngIf="!currentAdmission || currentAdmission.departmentId !== department.id" expand="block" (click)="openAdmitModal(department.id)">
+          Admit
+        </ion-button>
+        <ion-button *ngIf="currentAdmission && currentAdmission.departmentId === department.id" expand="block" (click)="openTransferModal(department.id)">
+          Transfer
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

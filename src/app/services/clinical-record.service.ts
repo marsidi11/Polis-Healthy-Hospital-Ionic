@@ -20,15 +20,6 @@ export class ClinicalRecordService {
       catchError(this.handleError<any[]>('getClinicalRecords', []))
     );
   }
-  // getClinicalRecords(patientId: number): Observable<any[]> {
-  //   return this.http.get(this.dataUrl).pipe(
-  //     map(data => {
-  //       const patient = data.patients.find((p: any) => p.id === patientId);
-  //       return patient ? [patient.clinicalRecord] : [];
-  //     }),
-  //     catchError(this.handleError<any[]>('getClinicalRecords', []))
-  //   );
-  // }
 
   addClinicalRecord(patientId: number, record: any): Observable<any> {
     return of(record).pipe(

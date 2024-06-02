@@ -3,46 +3,45 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
+export interface Department {
+  id: number;
+  name: string;
+}
+
+export interface Admission {
+  patientId: number;
+  departmentId: number;
+  cause: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AdmissionService {
-  private dataUrl = 'assets/data.json';  // URL to web api
+  private departmentsUrl = 'assets/data.json';  // URL to web api
+  private admissions: Admission[] = []; // In-memory storage for admissions
 
   constructor(private http: HttpClient) { }
 
-  getAdmissions(patientId: number): Observable<any[]> {
-    return this.http.get<any>(this.dataUrl).pipe(
-      map(data => {
-        const patient = data.patients.find((p: any) => p.id === patientId);
-        return patient ? patient.admissions : [];
-      }),
-      catchError(this.handleError<any[]>('getAdmissions', []))
+  getDepartments(): Observable<Department[]> {
+    return this.http.get<any>(this.departmentsUrl).pipe(
+      map(data => data.departments),
+      catchError(this.handleError<Department[]>('getDepartments', []))
     );
   }
 
-  createAdmission(patientId: number, admission: any): Observable<any> {
-    // Here you would normally post to the backend
+  admitPatient(admission: Admission): Observable<Admission> {
+    this.admissions = this.admissions.filter(a => a.patientId !== admission.patientId);
+    this.admissions.push(admission);
     return of(admission).pipe(
-      tap(newAdmission => console.log(`created admission for patient w/ id=${patientId} with admission id=${newAdmission.id}`)),
-      catchError(this.handleError<any>('createAdmission'))
+      tap(_ => console.log(`admitted patient id=${admission.patientId} to department id=${admission.departmentId}`)),
+      catchError(this.handleError<Admission>('admitPatient'))
     );
   }
 
-  editAdmission(patientId: number, admission: any): Observable<any> {
-    // Here you would normally put to the backend
-    return of(admission).pipe(
-      tap(_ => console.log(`updated admission id=${admission.id} for patient id=${patientId}`)),
-      catchError(this.handleError<any>('editAdmission'))
-    );
-  }
-
-  deleteAdmission(patientId: number, admissionId: number): Observable<any> {
-    // Here you would normally delete from the backend
-    return of({ id: admissionId }).pipe(
-      tap(_ => console.log(`deleted admission id=${admissionId} for patient id=${patientId}`)),
-      catchError(this.handleError<any>('deleteAdmission'))
-    );
+  getAdmissionByPatientId(patientId: number): Observable<Admission | undefined> {
+    const admission = this.admissions.find(a => a.patientId === patientId);
+    return of(admission);
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
