@@ -1,0 +1,294 @@
+// Variables (same as before)
+$primary-color: #4A4E69;
+$secondary-color: #6B705C;
+$accent-color: #CB997E;
+$light-color: #F2E9E4;
+$dark-color: #22223B;
+$gradient-start: #9C6644;
+$gradient-end: #A5A58D;
+
+// Global Styles
+ion-content {
+  --background: linear-gradient(135deg, $gradient-start, $gradient-end);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: rgba($dark-color, 0.8);
+    --color: $light-color;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    ion-title {
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: 'Georgia', serif;
+    }
+  }
+}
+
+// Searchbar Styles
+ion-searchbar {
+  --background: rgba($light-color, 0.9);
+  --color: $dark-color;
+  --placeholder-color: rgba($dark-color, 0.6);
+  --icon-color: $primary-color;
+  --border-radius: 50px;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px 10px;
+  max-width: 600px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Add New Button Styles
+ion-button[expand="full"] {
+  --background: $accent-color;
+  --background-hover: darken($accent-color, 10%);
+  --color: $light-color;
+  --border-radius: 50px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --padding-top: 15px;
+  --padding-bottom: 15px;
+  margin: 20px auto;
+  max-width: 400px;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: translateY(-2px);
+    --box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// Clinical Record Card Styles
+ion-card {
+  background: rgba($light-color, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  margin: 30px 20px;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://i.imgur.com/qwert7890.jpg') center/cover no-repeat;
+    opacity: 0.05;
+    z-index: 0;
+  }
+
+  &::after {
+    content: '📋';
+    font-size: 3rem;
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+    z-index: 0;
+  }
+}
+
+ion-card-header {
+  background: $primary-color;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+
+  ion-card-title {
+    color: $light-color;
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-family: 'Georgia', serif;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+ion-card-content {
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+// Clinical Data Items
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --inner-border-width: 0;
+
+  &:not(:last-child) {
+    --inner-border-width: 1px 0 0 0;
+    --border-color: rgba($primary-color, 0.1);
+  }
+
+  ion-label {
+    margin: 15px 20px;
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $secondary-color;
+      margin-bottom: 5px;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $dark-color;
+      font-style: italic;
+      line-height: 1.4;
+      white-space: normal;
+    }
+  }
+}
+
+// Card Action Buttons
+ion-card-content ion-button {
+  --border-radius: 50px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 15px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: translateY(-2px);
+    --box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  &:first-of-type {
+    --background: $secondary-color;
+    --background-hover: darken($secondary-color, 10%);
+  }
+}
+
+// No Records Card
+ion-card:last-child {
+  background: rgba($dark-color, 0.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  ion-card-header {
+    background: rgba($primary-color, 0.7);
+  }
+
+  ion-card-content {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    color: rgba($dark-color, 0.7);
+    font-size: 1rem;
+  }
+
+  &::after {
+    content: '🔍';
+    font-size: 4rem;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0.1;
+    transform: none;
+  }
+}
+
+// Media Queries
+@media (min-width: 768px) {
+  ion-searchbar, ion-button[expand="full"] {
+    max-width: 500px;
+  }
+
+  ion-card {
+    margin: 30px auto;
+    max-width: 600px;
+  }
+}
+
+// Dark Mode
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: linear-gradient(135deg, darken($gradient-start, 30%), darken($gradient-end, 30%));
+  }
+
+  ion-searchbar {
+    --background: rgba($dark-color, 0.7);
+    --color: $light-color;
+    --placeholder-color: rgba($light-color, 0.6);
+    --icon-color: $accent-color;
+  }
+
+  ion-button[expand="full"] {
+    --background: lighten($accent-color, 10%);
+    --background-hover: $accent-color;
+    --color: $dark-color;
+  }
+
+  ion-card {
+    background: rgba($dark-color, 0.85);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+
+    &::before {
+      opacity: 0.1;
+    }
+
+    &::after {
+      opacity: 0.15;
+    }
+  }
+
+  ion-card-header {
+    background: $secondary-color;
+  }
+
+  ion-item {
+    --border-color: rgba($light-color, 0.1);
+
+    ion-label {
+      h2 {
+        color: lighten($secondary-color, 20%);
+      }
+
+      p {
+        color: $light-color;
+      }
+    }
+  }
+
+  ion-card-content ion-button {
+    &:first-of-type {
+      --background: lighten($secondary-color, 10%);
+      --background-hover: $secondary-color;
+      --color: $dark-color;
+    }
+  }
+
+  ion-card:last-child {
+    background: rgba($light-color, 0.05);
+
+    ion-card-header {
+      background: rgba($secondary-color, 0.7);
+    }
+
+    ion-card-content {
+      color: rgba($light-color, 0.7);
+    }
+
+    &::after {
+      opacity: 0.15;
+    }
+  }
+}

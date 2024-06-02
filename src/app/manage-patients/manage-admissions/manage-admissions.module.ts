@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
-import { ManageAdmissionsPageRoutingModule } from './manage-admissions-routing.module';
+import { RouterModule } from '@angular/router';
 
 import { ManageAdmissionsPage } from './manage-admissions.page';
 
@@ -13,7 +11,12 @@ import { ManageAdmissionsPage } from './manage-admissions.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    ManageAdmissionsPageRoutingModule
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ManageAdmissionsPage
+      }
+    ])
   ],
   declarations: [ManageAdmissionsPage]
 })

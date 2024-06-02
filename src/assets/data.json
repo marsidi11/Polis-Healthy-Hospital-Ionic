@@ -1,10 +1,106 @@
 {
     "patients": [
-        {"id": 1, "name": "John Doe", "age": 30, "department": "Cardiology"},
-        {"id": 2, "name": "Jane Smith", "age": 40, "department": "Neurology"},
-        {"id": 3, "name": "Alice Johnson", "age": 50, "department": "Orthopedics"},
-        {"id": 4, "name": "Bob Williams", "age": 60, "department": "Radiology"},
-        {"id": 5, "name": "Charlie Brown", "age": 70, "department": "Gastroenterology"}
+        {
+            "id": 1,
+            "name": "John Doe",
+            "age": 30,
+            "department": "Cardiology",
+            "clinicalRecord": {
+                "diagnosis": "Hypertension",
+                "medications": ["Medication 1", "Medication 2"],
+                "allergies": ["Allergy 1", "Allergy 2"]
+            },
+            "admissions": [
+                {
+                    "id": 1,
+                    "admissionDate": "2022-01-01",
+                    "dischargeDate": "2022-01-10",
+                    "reason": "High blood pressure"
+                },
+                {
+                    "id": 2,
+                    "admissionDate": "2022-02-01",
+                    "dischargeDate": "2022-02-10",
+                    "reason": "Routine check-up"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Jane Smith",
+            "age": 40,
+            "department": "Neurology",
+            "clinicalRecord": {
+                "diagnosis": "Migraine",
+                "medications": ["Medication 3", "Medication 4"],
+                "allergies": ["Allergy 3", "Allergy 4"]
+            },
+            "admissions": [
+                {
+                    "id": 3,
+                    "admissionDate": "2022-03-01",
+                    "dischargeDate": "2022-03-10",
+                    "reason": "Severe headache"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Alice Johnson",
+            "age": 50,
+            "department": "Orthopedics",
+            "clinicalRecord": {
+                "diagnosis": "Arthritis",
+                "medications": ["Medication 5", "Medication 6"],
+                "allergies": ["Allergy 5", "Allergy 6"]
+            },
+            "admissions": [
+                {
+                    "id": 4,
+                    "admissionDate": "2022-04-01",
+                    "dischargeDate": "2022-04-10",
+                    "reason": "Joint pain"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Bob Williams",
+            "age": 60,
+            "department": "Radiology",
+            "clinicalRecord": {
+                "diagnosis": "Lung Cancer",
+                "medications": ["Medication 7", "Medication 8"],
+                "allergies": ["Allergy 7", "Allergy 8"]
+            },
+            "admissions": [
+                {
+                    "id": 5,
+                    "admissionDate": "2022-05-01",
+                    "dischargeDate": "2022-05-10",
+                    "reason": "Cancer treatment"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Charlie Brown",
+            "age": 70,
+            "department": "Gastroenterology",
+            "clinicalRecord": {
+                "diagnosis": "Gastritis",
+                "medications": ["Medication 9", "Medication 10"],
+                "allergies": ["Allergy 9", "Allergy 10"]
+            },
+            "admissions": [
+                {
+                    "id": 6,
+                    "admissionDate": "2022-06-01",
+                    "dischargeDate": "2022-06-10",
+                    "reason": "Stomach pain"
+                }
+            ]
+        }
     ],
     "departments": [
         {"id": 1, "name": "Cardiology"},

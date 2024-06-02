@@ -1,13 +1,41 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>manage-clinical-records</ion-title>
+    <ion-title>Manage Clinical Records</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">manage-clinical-records</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterClinicalRecords()" placeholder="Search Clinical Data"></ion-searchbar>
+  <ion-button expand="full" color="primary" (click)="openCreateModal()">Add New Clinical Data</ion-button>
+  
+  <ion-card *ngFor="let record of filteredClinicalRecords">
+    <ion-card-header>
+      <ion-card-title>Diagnose: {{ record.diagnosis }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>
+          <h2>Medications</h2>
+          <p>{{ record.medications.join(', ') }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h2>Allergies</h2>
+          <p>{{ record.allergies.join(', ') }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-button expand="full" color="secondary" (click)="openEditModal(record)">Edit</ion-button>
+      <ion-button expand="full" color="danger" (click)="deleteClinicalRecord(record)">Delete</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="filteredClinicalRecords && filteredClinicalRecords.length === 0">
+    <ion-card-header>
+      <ion-card-title>No Clinical Records Found</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>No clinical records available for the specified patient.</p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
