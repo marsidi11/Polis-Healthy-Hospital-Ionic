@@ -5,21 +5,28 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid>
-    <ion-row class="header">
-      <ion-col>Department</ion-col>
-      <ion-col>Actions</ion-col>
-    </ion-row>
-    <ion-row *ngFor="let department of departments">
-      <ion-col>{{department.name}}</ion-col>
-      <ion-col>
-        <ion-button *ngIf="!currentAdmission || currentAdmission.departmentId !== department.id" expand="block" (click)="openAdmitModal(department.id)">
-          Admit
-        </ion-button>
-        <ion-button *ngIf="currentAdmission && currentAdmission.departmentId === department.id" expand="block" (click)="openTransferModal(department.id)">
-          Transfer
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <!-- Display Patient Name -->
+  <div *ngIf="patient" class="patient-name">
+    <h2>Patient Name: {{ patient.name }}</h2>
+  </div>
+
+  <!-- Search Bar -->
+  <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterDepartments()" placeholder="Search Department" color="light"></ion-searchbar>
+
+  <!-- Departments List -->
+  <ion-list>
+    <ion-item *ngFor="let department of filteredDepartments">
+      <ion-label>{{ department.name }}</ion-label>
+      <ion-button 
+        *ngIf="!currentAdmission || currentAdmission.departmentId !== department.id" 
+        (click)="openAdmitModal(department.id)">
+        Admit
+      </ion-button>
+      <ion-button 
+        *ngIf="currentAdmission && currentAdmission.departmentId === department.id" 
+        color="success" disabled>
+        Admitted
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

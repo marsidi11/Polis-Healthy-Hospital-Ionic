@@ -13,14 +13,12 @@
 
   <ion-grid>
     <ion-row class="header">
-      <ion-col>ID</ion-col>
       <ion-col>Name</ion-col>
       <ion-col>Age</ion-col>
       <ion-col>Department</ion-col>
       <ion-col>Actions</ion-col>
     </ion-row>
     <ion-row *ngFor="let patient of filteredPatients">
-      <ion-col>{{patient.id}}</ion-col>
       <ion-col>{{patient.name}}</ion-col>
       <ion-col>{{patient.age}}</ion-col>
       <ion-col>{{patient.department}}</ion-col>

@@ -18,30 +18,59 @@ export interface Admission {
   providedIn: 'root'
 })
 export class AdmissionService {
-  private departmentsUrl = 'assets/data.json';  // URL to web api
+  private dataUrl = 'assets/data.json';  // URL to web api
   private admissions: Admission[] = []; // In-memory storage for admissions
 
   constructor(private http: HttpClient) { }
 
   getDepartments(): Observable<Department[]> {
-    return this.http.get<any>(this.departmentsUrl).pipe(
+    return this.http.get<any>(this.dataUrl).pipe(
       map(data => data.departments),
       catchError(this.handleError<Department[]>('getDepartments', []))
     );
   }
 
-  admitPatient(admission: Admission): Observable<Admission> {
-    this.admissions = this.admissions.filter(a => a.patientId !== admission.patientId);
-    this.admissions.push(admission);
-    return of(admission).pipe(
-      tap(_ => console.log(`admitted patient id=${admission.patientId} to department id=${admission.departmentId}`)),
-      catchError(this.handleError<Admission>('admitPatient'))
+  getPatients(): Observable<any[]> {
+    return this.http.get<any>(this.dataUrl).pipe(
+      map(data => data.patients),
+      catchError(this.handleError<any[]>('getPatients', []))
     );
   }
 
   getAdmissionByPatientId(patientId: number): Observable<Admission | undefined> {
-    const admission = this.admissions.find(a => a.patientId === patientId);
-    return of(admission);
+    return this.http.get<any>(this.dataUrl).pipe(
+      map(data => {
+        const patient = data.patients.find((p: any) => p.id === patientId);
+        if (patient && patient.department) {
+          const department = data.departments.find((d: Department) => d.name === patient.department);
+          if (department) {
+            return { patientId, departmentId: department.id, cause: '' };
+          }
+        }
+        return undefined;
+      }),
+      catchError(this.handleError<Admission>('getAdmissionByPatientId'))
+    );
+  }
+
+  admitPatient(admission: Admission): Observable<Admission> {
+    return this.http.get<any>(this.dataUrl).pipe(
+      map(data => {
+        // Update the patient data in the json
+        const patient = data.patients.find((p: any) => p.id === admission.patientId);
+        if (patient) {
+          const department = data.departments.find((d: Department) => d.id === admission.departmentId);
+          if (department) {
+            patient.department = department.name;
+          }
+        }
+        this.admissions = this.admissions.filter(a => a.patientId !== admission.patientId);
+        this.admissions.push(admission);
+        return admission;
+      }),
+      tap(_ => console.log(`admitted patient id=${admission.patientId} to department id=${admission.departmentId}`)),
+      catchError(this.handleError<Admission>('admitPatient'))
+    );
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

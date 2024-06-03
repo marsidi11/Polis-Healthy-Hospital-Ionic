@@ -1,0 +1,228 @@
+// Variables (same as before)
+$primary-color: #4A4E69;
+$secondary-color: #6B705C;
+$accent-color: #CB997E;
+$light-color: #F2E9E4;
+$dark-color: #22223B;
+$gradient-start: #9C6644;
+$gradient-end: #A5A58D;
+$success-color: #81B29A;
+
+// Global Styles
+ion-content {
+  --background: linear-gradient(135deg, $gradient-start, $gradient-end);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://i.imgur.com/qwert5678.jpg') center/cover no-repeat;
+    opacity: 0.1;
+    z-index: -1;
+  }
+}
+
+ion-header {
+  ion-toolbar {
+    --background: rgba($dark-color, 0.8);
+    --color: $light-color;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    ion-title {
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: 'Georgia', serif;
+    }
+  }
+}
+
+// Searchbar Styles
+ion-searchbar {
+  --background: rgba($light-color, 0.9);
+  --color: $dark-color;
+  --placeholder-color: rgba($dark-color, 0.6);
+  --icon-color: $primary-color;
+  --border-radius: 50px;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px 10px;
+  max-width: 600px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  --placeholder-font-style: italic;
+  backdrop-filter: blur(10px);
+}
+
+// List Styles
+ion-list {
+  background: none;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: '🏥';
+    font-size: 150px;
+    position: absolute;
+    bottom: -20px;
+    right: -10px;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+    z-index: -1;
+    pointer-events: none;
+  }
+}
+
+// Item Styles
+ion-item {
+  --background: rgba($light-color, 0.85);
+  --color: $dark-color;
+  --border-color: rgba($primary-color, 0.1);
+  --border-style: dashed;
+  --border-width: 1px;
+  --padding-start: 15px;
+  --padding-end: 10px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --border-radius: 15px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 15px;
+
+  ion-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: $secondary-color;
+    font-family: 'Georgia', serif;
+  }
+
+  ion-button {
+    --background: $primary-color;
+    --background-hover: darken($primary-color, 10%);
+    --color: $light-color;
+    --border-radius: 20px;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+
+    &:hover {
+      transform: translateY(-2px);
+      --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    &[color="success"] {
+      --background: $success-color;
+      --background-hover: darken($success-color, 10%);
+      --color: $dark-color;
+      opacity: 0.9;
+    }
+  }
+
+  &:hover {
+    transform: translateX(5px);
+    --background: rgba($light-color, 0.95);
+    --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+
+//   &::before {
+//     content: '🚪';
+//     font-size: 24px;
+//     position: absolute;
+//     top: 50%;
+//     left: -12px;
+//     transform: translateY(-50%);
+//     opacity: 0;
+//     transition: opacity 0.3s, transform 0.3s;
+//   }
+
+  &:hover::before {
+    opacity: 1;
+    transform: translate(10px, -50%);
+  }
+}
+
+// Media Queries
+@media (min-width: 768px) {
+  ion-searchbar {
+    max-width: 500px;
+  }
+
+  ion-list {
+    padding: 30px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+// Dark Mode
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: linear-gradient(135deg, darken($gradient-start, 30%), darken($gradient-end, 30%));
+
+    &::before {
+      opacity: 0.15;
+      filter: brightness(0.7) contrast(1.2);
+    }
+  }
+
+  ion-header ion-toolbar {
+    --background: rgba($light-color, 0.1);
+    --color: $dark-color;
+  }
+
+  ion-searchbar {
+    --background: rgba($dark-color, 0.7);
+    --color: $light-color;
+    --placeholder-color: rgba($light-color, 0.6);
+    --icon-color: $accent-color;
+  }
+
+  ion-item {
+    --background: rgba($dark-color, 0.7);
+    --color: $light-color;
+    --border-color: rgba($light-color, 0.1);
+
+    ion-label {
+      color: lighten($secondary-color, 30%);
+    }
+
+    ion-button {
+      --background: lighten($primary-color, 15%);
+      --background-hover: lighten($primary-color, 5%);
+
+      &[color="success"] {
+        --background: lighten($success-color, 15%);
+        --background-hover: lighten($success-color, 5%);
+      }
+    }
+
+    &:hover {
+      --background: rgba($dark-color, 0.9);
+    }
+  }
+
+  ion-list::before {
+    opacity: 0.15;
+  }
+}
+
+.patient-name {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: $secondary-color;
+  font-family: 'Georgia', serif;
+  text-align: center;
+
+}
