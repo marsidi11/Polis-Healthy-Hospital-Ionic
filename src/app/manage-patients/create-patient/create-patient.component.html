@@ -9,39 +9,56 @@
 
 <ion-content>
   <form [formGroup]="form" (ngSubmit)="submit()">
-    <ion-list>
+    <ion-grid>
+      <ion-row class="header">
+        <ion-col>Department</ion-col>
+      </ion-row>
       <ion-radio-group formControlName="departmentId">
-        <ion-list-header>
-          <ion-label>Select Department</ion-label>
-        </ion-list-header>
-
-        <ion-item *ngFor="let department of departments">
-          <ion-label>{{ department.name }}</ion-label>
-          <ion-radio slot="start" [value]="department.id"></ion-radio>
-        </ion-item>
+        <ion-row *ngFor="let department of departments">
+          <ion-col size="10">{{ department.departmentName }}</ion-col>
+          <ion-col size="2">
+            <ion-radio [value]="department.id"></ion-radio>
+          </ion-col>
+        </ion-row>
       </ion-radio-group>
 
-      <ion-item>
-        <ion-label position="stacked">First Name</ion-label>
-        <ion-input formControlName="firstName" type="text"></ion-input>
-      </ion-item>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label position="stacked">First Name</ion-label>
+            <ion-input formControlName="firstName" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-      <ion-item>
-        <ion-label position="stacked">Last Name</ion-label>
-        <ion-input formControlName="lastName" type="text"></ion-input>
-      </ion-item>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label position="stacked">Last Name</ion-label>
+            <ion-input formControlName="lastName" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-      <ion-item>
-        <ion-label position="stacked">Birth Date</ion-label>
-        <ion-datetime formControlName="birthDate"></ion-datetime>
-      </ion-item>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label position="stacked">Birth Date</ion-label>
+            <ion-datetime presentation="date" [preferWheel]="true" formControlName="birthDate"></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-      <ion-item>
-        <ion-label position="stacked">Admission Reason</ion-label>
-        <ion-input formControlName="admissionReason" type="text"></ion-input>
-      </ion-item>
-    </ion-list>
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label position="stacked">Admission Reason</ion-label>
+            <ion-input formControlName="admissionReason" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-    <ion-button expand="full" type="submit">Create</ion-button>
+    <ion-button expand="block" type="submit">Create Patient</ion-button>
   </form>
 </ion-content>

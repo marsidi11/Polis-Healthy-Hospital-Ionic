@@ -25,7 +25,9 @@ export class CreatePatientModalComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('Departments:', this.departments);
+  }
 
   dismiss() {
     this.modalController.dismiss();
