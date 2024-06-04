@@ -14,14 +14,14 @@
   <ion-grid>
     <ion-row class="header">
       <ion-col>Name</ion-col>
-      <ion-col>Age</ion-col>
+      <ion-col>Birth Date</ion-col>
       <ion-col>Department</ion-col>
       <ion-col>Actions</ion-col>
     </ion-row>
     <ion-row *ngFor="let patient of filteredPatients">
-      <ion-col>{{patient.name}}</ion-col>
-      <ion-col>{{patient.age}}</ion-col>
-      <ion-col>{{patient.department}}</ion-col>
+      <ion-col>{{patient.firstName}} {{patient.lastName}}</ion-col>
+      <ion-col>{{patient.birthDate}}</ion-col>
+      <ion-col>{{patient.departmentCode}}</ion-col>
       <ion-col>
         <ion-button fill="clear" color="tertiary" (click)="openEditModal(patient)">Edit</ion-button>
         <ion-button fill="clear" color="danger" (click)="deletePatient(patient)">Delete</ion-button>

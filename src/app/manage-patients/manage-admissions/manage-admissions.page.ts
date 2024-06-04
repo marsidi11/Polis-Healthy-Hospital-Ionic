@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { AdmissionService, Department, Admission } from '../../services/admission.service';
-import { PatientService, Patient } from '../../services/patient.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-manage-admissions',
@@ -11,7 +11,7 @@ import { PatientService, Patient } from '../../services/patient.service';
 })
 export class ManageAdmissionsPage implements OnInit {
   patientId: number;
-  patient: Patient | undefined;
+  patient: undefined;
   departments: Department[] = [];
   filteredDepartments: Department[] = [];
   currentAdmission: Admission | undefined;

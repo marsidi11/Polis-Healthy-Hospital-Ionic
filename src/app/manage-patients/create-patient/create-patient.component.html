@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Create Patient</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <ion-list>
+      <ion-radio-group formControlName="departmentId">
+        <ion-list-header>
+          <ion-label>Select Department</ion-label>
+        </ion-list-header>
+
+        <ion-item *ngFor="let department of departments">
+          <ion-label>{{ department.name }}</ion-label>
+          <ion-radio slot="start" [value]="department.id"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
+
+      <ion-item>
+        <ion-label position="stacked">First Name</ion-label>
+        <ion-input formControlName="firstName" type="text"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Last Name</ion-label>
+        <ion-input formControlName="lastName" type="text"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Birth Date</ion-label>
+        <ion-datetime formControlName="birthDate"></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Admission Reason</ion-label>
+        <ion-input formControlName="admissionReason" type="text"></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="full" type="submit">Create</ion-button>
+  </form>
+</ion-content>

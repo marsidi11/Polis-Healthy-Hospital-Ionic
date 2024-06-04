@@ -1,65 +1,84 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-
-export interface Patient {
-  id: number;
-  name: string;
-  age: number;
-  department: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientService {
-  private dataUrl = 'assets/data.json';  // URL to web api
+  private dataUrl = 'http://localhost:8080/api/patient';  // URL to web api
 
   constructor(private http: HttpClient) { }
 
-  getPatients(): Observable<Patient[]> {
-    return this.http.get<any>(this.dataUrl).pipe(
-      map(data => data.patients),
-      catchError(this.handleError<Patient[]>('getPatients', []))
+  getPatients(): Observable<any[]> {
+    return this.http.get<any>(`${this.dataUrl}`).pipe(
+      map(response => response.content),
+      tap(data => console.log('Data received:', data)),
+      catchError(this.handleError<any[]>('getPatients', []))
     );
   }
 
-  createPatient(patient: Patient): Observable<Patient> {
-    // Here you would normally post to the backend
-    return of(patient).pipe(
+  // getPatient(patientId: number): Observable<any> {
+  //   return this.http.get<any>(`${this.dataUrl}/${patientId}`).pipe(
+  //     tap(data => console.log(`Fetched patient id=${patientId}`)),
+  //     catchError(this.handleError<any>('getPatient'))
+  //   );
+  // }
+
+  createPatient(patient: any): Observable<any> {
+    return this.http.post<any>(this.dataUrl, patient).pipe(
       tap(newPatient => console.log(`created patient w/ id=${newPatient.id}`)),
-      catchError(this.handleError<Patient>('createPatient'))
+      catchError(this.handleError<any>('createPatient'))
     );
   }
 
-  editPatient(patient: Patient): Observable<any> {
-    // Here you would normally put to the backend
-    return of(patient).pipe(
-      tap(_ => console.log(`updated patient id=${patient.id}`)),
+  editPatient(patientId: number, patient: any): Observable<any> {
+    return this.http.put<any>(`${this.dataUrl}/${patientId}`, patient).pipe(
+      tap(_ => console.log(`updated patient id=${patientId}`)),
       catchError(this.handleError<any>('editPatient'))
     );
   }
 
-  deletePatient(id: number): Observable<any> {
-    // Here you would normally delete from the backend
-    return of({ id }).pipe(
-      tap(_ => console.log(`deleted patient id=${id}`)),
+  deletePatient(patientId: number): Observable<any> {
+    return this.http.delete<any>(`${this.dataUrl}/${patientId}`).pipe(
+      tap(_ => console.log(`deleted patient id=${patientId}`)),
       catchError(this.handleError<any>('deletePatient'))
     );
   }
 
-  dischargePatient(id: number, dischargeReason: string): Observable<any> {
-    // Here you would normally update the backend
-    return of({ id, dischargeReason }).pipe(
-      tap(_ => console.log(`discharged patient id=${id} with reason=${dischargeReason}`)),
+  dischargePatient(patientId: number, dischargeReason: string): Observable<any> {
+    const url = `${this.dataUrl}/${patientId}/discharge`;
+    const body = { dischargeReason };
+    return this.http.put<any>(url, body).pipe(
+      tap(_ => console.log(`discharged patient id=${patientId} with reason=${dischargeReason}`)),
       catchError(this.handleError<any>('dischargePatient'))
+    );
+  }
+
+  request(method: string, url: string, body?: any): Observable<any> {
+    return this.http.request<any>(method, url, { body }).pipe(
+      tap(_ => console.log(`Made ${method} request to ${url}`)),
+      catchError(this.handleError<any>('request'))
     );
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error);
+      // Log the error to the console
+      console.error(`Failed to ${operation}: ${error.message}`);
+  
+      // If the error response has a status, log that as well
+      if (error.status) {
+        console.error(`Status code: ${error.status}`);
+      }
+  
+      // If the error response has an error object, log that as well
+      if (error.error) {
+        console.error(error.error);
+      }
+  
+      // Return the provided default result
       return of(result as T);
     };
   }

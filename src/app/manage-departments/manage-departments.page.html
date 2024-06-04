@@ -13,14 +13,16 @@
 
   <ion-grid>
     <ion-row class="header">
+      <ion-col class="header-col">Code</ion-col>
       <ion-col class="header-col">Name</ion-col>
       <ion-col class="header-col">Actions</ion-col>
     </ion-row>
     <ion-row *ngFor="let department of filteredDepartments" class="department-row">
-      <ion-col>{{ department.name }}</ion-col>
+      <ion-col>{{ department.departmentCode }}</ion-col>
+      <ion-col>{{ department.departmentName }}</ion-col>
       <ion-col class="actions-col">
         <ion-button fill="clear" color="tertiary" (click)="openEditModal(department)"  class="action-button">Edit</ion-button>
-        <ion-button fill="clear" color="danger" (click)="deleteDepartment(department)" class="action-button">Delete</ion-button>
+        <ion-button fill="clear" color="danger" (click)="deleteDepartment(department.id,department)" class="action-button">Delete</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>

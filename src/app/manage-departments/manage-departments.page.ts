@@ -4,7 +4,8 @@ import { AlertController, ModalController } from '@ionic/angular';
 
 export interface Department {
   id: number;
-  name: string;
+  departmentCode: string;
+  departmentName: string;
 }
 
 @Component({
@@ -31,6 +32,7 @@ export class ManageDepartmentsPage implements OnInit {
     this.departmentService.getDepartments().subscribe(departments => {
       this.departments = departments;
       this.filteredDepartments = departments;
+      console.log('Departments:', departments);
     });
   }
 
@@ -39,7 +41,7 @@ export class ManageDepartmentsPage implements OnInit {
       this.filteredDepartments = this.departments;
     } else {
       this.filteredDepartments = this.departments.filter(department =>
-        department.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        department.departmentName.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
   }
@@ -49,7 +51,12 @@ export class ManageDepartmentsPage implements OnInit {
       header: 'Create Department',
       inputs: [
         {
-          name: 'name',
+          name: 'departmentCode',
+          type: 'text',
+          placeholder: 'Department Code'
+        },
+        {
+          name: 'departmentName',
           type: 'text',
           placeholder: 'Department Name'
         }
@@ -63,7 +70,7 @@ export class ManageDepartmentsPage implements OnInit {
         {
           text: 'Create',
           handler: data => {
-            this.createDepartment(data.name);
+            this.createDepartment(data.departmentCode, data.departmentName);
           }
         }
       ]
@@ -77,9 +84,15 @@ export class ManageDepartmentsPage implements OnInit {
       header: 'Edit Department',
       inputs: [
         {
-          name: 'name',
+          name: 'departmentCode',
           type: 'text',
-          value: department.name,
+          value: department.departmentCode,
+          placeholder: 'Department Code'
+        },
+        {
+          name: 'departmentName',
+          type: 'text',
+          value: department.departmentName,
           placeholder: 'Department Name'
         }
       ],
@@ -92,7 +105,7 @@ export class ManageDepartmentsPage implements OnInit {
         {
           text: 'Save',
           handler: data => {
-            this.editDepartment(department.id, data.name);
+            this.editDepartment(department.id, data.departmentName, data.departmentCode);
           }
         }
       ]
@@ -101,28 +114,34 @@ export class ManageDepartmentsPage implements OnInit {
     await alert.present();
   }
 
-  createDepartment(name: string) {
-    const newDepartment: Department = { id: this.departments.length + 1, name };
+  createDepartment(departmentCode: string, departmentName: string) {
+    const newDepartment = { departmentCode, departmentName } as Department;
     this.departmentService.createDepartment(newDepartment).subscribe(department => {
       this.departments.push(department);
       this.filterDepartments(); // Refresh the filtered list
     });
   }
 
-  editDepartment(id: number, name: string) {
+  editDepartment(id: number, departmentName: string, departmentCode: string) {
     const department = this.departments.find(dep => dep.id === id);
     if (department) {
-      department.name = name;
-      this.departmentService.editDepartment(department).subscribe(() => {
-        this.filterDepartments(); // Refresh the filtered list
+      department.departmentName = departmentName;
+      department.departmentCode = departmentCode;
+      this.departmentService.editDepartment(id, department).subscribe(updatedDepartment => {
+        // Update the local department with the updated details
+        const index = this.departments.findIndex(dep => dep.id === id);
+        if (index !== -1) {
+          this.departments[index] = updatedDepartment;
+          this.filterDepartments(); // Refresh the filtered list
+        }
       });
     }
   }
 
-  async deleteDepartment(department: Department) {
+  async deleteDepartment(id: number, department: Department) {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
-      message: `Are you sure you want to delete the department ${department.name}?`,
+      message: `Are you sure you want to delete the department ${department.departmentName}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -132,8 +151,8 @@ export class ManageDepartmentsPage implements OnInit {
         {
           text: 'Delete',
           handler: () => {
-            this.departmentService.deleteDepartment(department.id).subscribe(() => {
-              this.departments = this.departments.filter(dep => dep.id !== department.id);
+            this.departmentService.deleteDepartment(id).subscribe(() => {
+              this.departments = this.departments.filter(dep => dep.id !== id);
               this.filterDepartments(); // Refresh the filtered list
             });
           }

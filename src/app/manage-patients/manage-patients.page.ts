@@ -1,36 +1,51 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService } from '../services/patient.service';
-import { AlertController, NavController } from '@ionic/angular';
+import { DepartmentService } from '../services/department.service';
+import { AlertController, ModalController, NavController } from '@ionic/angular'; // Import NavController
+import { CreatePatientModalComponent } from './create-patient/create-patient.component';
 
 export interface Patient {
   id: number;
+  firstName: string;
+  lastName: string;
+  departmentCode: string;
+  departmentId: number;
+  birthDate: string;
+  admissionReason: string;
+}
+
+export interface Department {
+  id: number;
+  departmentCode: string;
   name: string;
-  age: number;
-  department: string;
 }
 
 @Component({
   selector: 'app-manage-patients',
   templateUrl: './manage-patients.page.html',
-  styleUrls: ['./manage-patients.page.scss']
+  styleUrls: ['./manage-patients.page.scss'],
 })
 export class ManagePatientsPage implements OnInit {
   patients: Patient[] = [];
+  departments: Department[] = [];
   filteredPatients: Patient[] = [];
   searchTerm: string = '';
 
   constructor(
     private patientService: PatientService,
+    private departmentService: DepartmentService,
     private alertController: AlertController,
-    private navCtrl: NavController
+    private modalController: ModalController,
+    private navCtrl: NavController // Inject NavController here
   ) {}
 
   ngOnInit() {
     this.getPatients();
+    this.getDepartments();
   }
 
   getPatients(): void {
-    this.patientService.getPatients().subscribe(patients => {
+    this.patientService.getPatients().subscribe((patients) => {
       this.patients = patients;
       this.filteredPatients = patients;
     });
@@ -40,48 +55,70 @@ export class ManagePatientsPage implements OnInit {
     if (this.searchTerm.trim() === '') {
       this.filteredPatients = this.patients;
     } else {
-      this.filteredPatients = this.patients.filter(patient =>
-        patient.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      this.filteredPatients = this.patients.filter((patient) =>
+        (patient.firstName.toLowerCase() + ' ' + patient.lastName.toLowerCase()).includes(this.searchTerm.toLowerCase())
       );
     }
   }
 
+  getDepartments() {
+    this.departmentService.getDepartments().subscribe((departments) => {
+      this.departments = departments;
+      console.log('Departments:', departments);
+    });
+  }
+
   async openCreateModal() {
-    const alert = await this.alertController.create({
-      header: 'Create Patient',
-      inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          placeholder: 'Patient Name'
-        },
-        {
-          name: 'age',
-          type: 'number',
-          placeholder: 'Patient Age'
-        },
-        {
-          name: 'department',
-          type: 'text',
-          placeholder: 'Department'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
-        {
-          text: 'Create',
-          handler: data => {
-            this.createPatient(data.name, data.age, data.department);
-          }
-        }
-      ]
+    const modal = await this.modalController.create({
+      component: CreatePatientModalComponent,
+      componentProps: {
+        departments: this.departments,
+      },
     });
 
-    await alert.present();
+    modal.onDidDismiss().then((result) => {
+      if (result.data) {
+        const data = result.data;
+        const selectedDepartment = this.departments.find((dept) => dept.id === data.departmentId);
+        if (selectedDepartment) {
+          this.createPatient(
+            data.firstName,
+            data.lastName,
+            data.birthDate,
+            selectedDepartment.departmentCode,
+            selectedDepartment.id,
+            data.admissionReason
+          );
+        } else {
+          console.error('No department selected');
+        }
+      }
+    });
+
+    await modal.present();
+  }
+
+  createPatient(
+    firstName: string,
+    lastName: string,
+    birthDate: string,
+    departmentCode: string,
+    departmentId: number,
+    admissionReason: string
+  ) {
+    const newPatient = {
+      firstName,
+      lastName,
+      birthDate,
+      departmentCode,
+      departmentId,
+      admissionReason,
+    } as Patient;
+    console.log(newPatient);
+    this.patientService.createPatient(newPatient).subscribe((patient) => {
+      this.patients.push(patient);
+      this.filterPatients(); // Refresh the filtered list
+    });
   }
 
   async openEditModal(patient: Patient) {
@@ -89,37 +126,70 @@ export class ManagePatientsPage implements OnInit {
       header: 'Edit Patient',
       inputs: [
         {
-          name: 'name',
+          name: 'firstName',
           type: 'text',
-          value: patient.name,
-          placeholder: 'Patient Name'
+          value: patient.firstName,
+          placeholder: 'Patient First Name',
         },
         {
-          name: 'age',
-          type: 'number',
-          value: patient.age,
-          placeholder: 'Patient Age'
+          name: 'lastName',
+          type: 'text',
+          value: patient.lastName,
+          placeholder: 'Patient Last Name',
         },
         {
-          name: 'department',
+          name: 'birthDate',
+          type: 'date',
+          value: patient.birthDate,
+          placeholder: 'Patient Birth Date',
+        },
+        {
+          name: 'departmentTitle',
           type: 'text',
-          value: patient.department,
-          placeholder: 'Department'
-        }
+          value: 'Select Department',
+          disabled: true,
+        },
+        {
+          name: 'departmentId',
+          type: 'radio',
+          label: 'Department 1',
+          value: '1',
+        },
+        {
+          name: 'admissionReason',
+          type: 'text',
+          value: patient.admissionReason,
+          placeholder: 'Admission Reason',
+        },
       ],
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
-          cssClass: 'secondary'
+          cssClass: 'secondary',
         },
         {
           text: 'Save',
-          handler: data => {
-            this.editPatient(patient.id, data.name, data.age, data.department);
-          }
-        }
-      ]
+          handler: (data) => {
+            const selectedDepartment = this.departments.find((dept) => dept.id === data.departmentId);
+            if (selectedDepartment) {
+              this.editPatient(
+                patient.id,
+                data.firstName,
+                data.lastName,
+                data.birthDate,
+                selectedDepartment.departmentCode,
+                selectedDepartment.id,
+                data.admissionReason
+              );
+              return true;
+            } else {
+              console.error('No department selected');
+              return false;
+            }
+          },
+        },
+      ],
     });
 
     await alert.present();
@@ -134,65 +204,75 @@ export class ManagePatientsPage implements OnInit {
           type: 'radio',
           label: 'Healthy',
           value: 'Healthy',
-          checked: true
+          checked: true,
         },
         {
           name: 'dischargeReason',
           type: 'radio',
           label: 'Transfer',
-          value: 'Transfer'
+          value: 'Transfer',
         },
         {
           name: 'dischargeReason',
           type: 'radio',
           label: 'Death',
-          value: 'Death'
-        }
+          value: 'Death',
+        },
       ],
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
-          cssClass: 'secondary'
+          cssClass: 'secondary',
         },
         {
           text: 'Discharge',
-          handler: data => {
+          handler: (data) => {
             this.dischargePatient(patient.id, data.dischargeReason);
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
   }
 
-  createPatient(name: string, age: number, department: string) {
-    const newPatient: Patient = { id: this.patients.length + 1, name, age, department };
-    this.patientService.createPatient(newPatient).subscribe(patient => {
-      this.patients.push(patient);
-      this.filterPatients(); // Refresh the filtered list
-    });
-  }
-
-  editPatient(id: number, name: string, age: number, department: string) {
-    const patient = this.patients.find(p => p.id === id);
+  editPatient(
+    id: number,
+    firstName: string,
+    lastName: string,
+    birthDate: string,
+    departmentCode: string,
+    departmentId: number,
+    admissionReason: string
+  ) {
+    const patient = this.patients.find((p) => p.id === id);
     if (patient) {
-      patient.name = name;
-      patient.age = age;
-      patient.department = department;
-      this.patientService.editPatient(patient).subscribe(() => {
-        this.filterPatients(); // Refresh the filtered list
+      const updatedPatient = {
+        ...patient,
+        firstName,
+        lastName,
+        birthDate,
+        departmentCode,
+        departmentId,
+        admissionReason,
+      };
+      this.patientService.editPatient(id, updatedPatient).subscribe((updatedPatient) => {
+        const index = this.patients.findIndex((p) => p.id === id);
+        if (index !== -1) {
+          this.patients[index] = updatedPatient;
+          this.filterPatients();
+        }
       });
     }
   }
 
   dischargePatient(id: number, dischargeReason: string) {
-    this.patientService.dischargePatient(id, dischargeReason).subscribe(() => {
-      const patient = this.patients.find(p => p.id === id);
-      if (patient) {
-        patient.department = ''; // Clear department to indicate discharge
-        this.filterPatients(); // Refresh the filtered list
+    this.patientService.dischargePatient(id, dischargeReason).subscribe((updatedPatient) => {
+      const index = this.patients.findIndex((p) => p.id === id);
+      if (index !== -1) {
+        this.patients[index] = updatedPatient;
+        this.filterPatients();
       }
     });
   }
@@ -200,23 +280,23 @@ export class ManagePatientsPage implements OnInit {
   async deletePatient(patient: Patient) {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
-      message: `Are you sure you want to delete the patient ${patient.name}?`,
+      message: `Are you sure you want to delete the patient ${patient.firstName} ${patient.lastName}?`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
-          cssClass: 'secondary'
+          cssClass: 'secondary',
         },
         {
           text: 'Delete',
           handler: () => {
             this.patientService.deletePatient(patient.id).subscribe(() => {
-              this.patients = this.patients.filter(p => p.id !== patient.id);
-              this.filterPatients(); // Refresh the filtered list
+              this.patients = this.patients.filter((p) => p.id !== patient.id);
+              this.filterPatients();
             });
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
 
     await alert.present();
