@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Department } from '../../manage-patients/manage-patients.page';
+import { DepartmentService, Department } from '../../services/department.service';
 
 @Component({
   selector: 'app-create-patient',

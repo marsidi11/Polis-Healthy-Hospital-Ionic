@@ -1,24 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { PatientService } from '../services/patient.service';
-import { DepartmentService } from '../services/department.service';
+import { PatientService, Patient } from '../services/patient.service';
+import { DepartmentService, Department } from '../services/department.service';
 import { AlertController, ModalController, NavController } from '@ionic/angular'; // Import NavController
 import { CreatePatientModalComponent } from './create-patient/create-patient.component';
-
-export interface Patient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  departmentCode: string;
-  departmentId: number;
-  birthDate: string;
-  admissionReason: string;
-}
-
-export interface Department {
-  id: number;
-  departmentCode: string;
-  departmentName: string;
-}
 
 @Component({
   selector: 'app-manage-patients',
@@ -36,7 +20,7 @@ export class ManagePatientsPage implements OnInit {
     private departmentService: DepartmentService,
     private alertController: AlertController,
     private modalController: ModalController,
-    private navCtrl: NavController // Inject NavController here
+    private navCtrl: NavController 
   ) {}
 
   ngOnInit() {
@@ -87,7 +71,7 @@ export class ManagePatientsPage implements OnInit {
             data.birthDate,
             selectedDepartment.departmentCode,
             selectedDepartment.id,
-            data.admissionReason
+            data.admissionState.admissionReason
           );
         } else {
           console.error('No department selected');
@@ -110,9 +94,14 @@ export class ManagePatientsPage implements OnInit {
       firstName,
       lastName,
       birthDate,
-      departmentCode,
-      departmentId,
-      admissionReason,
+      department: {
+        id: departmentId,
+      },
+      admissionState: [
+        {
+          admissionReason,
+        },
+      ],
     } as Patient;
     console.log(newPatient);
     this.patientService.createPatient(newPatient).subscribe((patient) => {
@@ -142,25 +131,7 @@ export class ManagePatientsPage implements OnInit {
           type: 'date',
           value: patient.birthDate,
           placeholder: 'Patient Birth Date',
-        },
-        {
-          name: 'departmentTitle',
-          type: 'text',
-          value: 'Select Department',
-          disabled: true,
-        },
-        {
-          name: 'departmentId',
-          type: 'radio',
-          label: 'Department 1',
-          value: '1',
-        },
-        {
-          name: 'admissionReason',
-          type: 'text',
-          value: patient.admissionReason,
-          placeholder: 'Admission Reason',
-        },
+        }
       ],
       buttons: [
         {
@@ -170,24 +141,9 @@ export class ManagePatientsPage implements OnInit {
         },
         {
           text: 'Save',
-          handler: (data) => {
-            const selectedDepartment = this.departments.find((dept) => dept.id === data.departmentId);
-            if (selectedDepartment) {
-              this.editPatient(
-                patient.id,
-                data.firstName,
-                data.lastName,
-                data.birthDate,
-                selectedDepartment.departmentCode,
-                selectedDepartment.id,
-                data.admissionReason
-              );
-              return true;
-            } else {
-              console.error('No department selected');
-              return false;
-            }
-          },
+          handler: data => {
+            this.editPatient(patient.id, data.firstName, data.lastName, data.birthDate);
+          }
         },
       ],
     });
@@ -196,66 +152,83 @@ export class ManagePatientsPage implements OnInit {
   }
 
   async openDischargeModal(patient: Patient) {
-    const alert = await this.alertController.create({
-      header: 'Discharge Patient',
-      inputs: [
-        {
-          name: 'dischargeReason',
-          type: 'radio',
-          label: 'Healthy',
-          value: 'Healthy',
-          checked: true,
-        },
-        {
-          name: 'dischargeReason',
-          type: 'radio',
-          label: 'Transfer',
-          value: 'Transfer',
-        },
-        {
-          name: 'dischargeReason',
-          type: 'radio',
-          label: 'Death',
-          value: 'Death',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Discharge',
-          handler: (data) => {
-            this.dischargePatient(patient.id, data.dischargeReason);
+    // Check if the patient is already discharged
+    if (patient.admissionState.some(state => state.discharged)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'The patient is already discharged.',
+        buttons: ['OK'],
+      });
+  
+      await alert.present();
+    } else {
+      const alert = await this.alertController.create({
+        header: 'Discharge Patient',
+        inputs: [
+          {
+            name: 'dischargeCause',
+            type: 'radio',
+            label: 'Healthy',
+            value: 'PATIENT_RECOVERY',
+            checked: true,
           },
-        },
-      ],
-    });
-
-    await alert.present();
+          {
+            name: 'dischargeCause',
+            type: 'radio',
+            label: 'Transfer',
+            value: 'PATIENT_HOSPITAL_TRANSFER',
+          },
+          {
+            name: 'dischargeCause',
+            type: 'radio',
+            label: 'Death',
+            value: 'PATIENT_DEATH',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            cssClass: 'secondary',
+          },
+          {
+            text: 'Discharge',
+            handler: (data) => {
+              this.patientService.dischargePatient(patient.id, data).subscribe({
+                next: (dischargedPatient) => {
+                  // Handle the successfully discharged patient.
+                  patient.department = { ...patient.department, departmentName: 'No Department Assigned' };
+                  patient.admissionState = patient.admissionState.map(state => ({ ...state, discharged: true }));                
+                },
+                error: (err) => {
+                  // Handle the error scenario.
+                  // patient.error = 'An error occurred while discharging the patient.';
+                }
+              });
+            },
+          },
+        ],
+      });
+  
+      await alert.present();
+    }
   }
+  
 
   editPatient(
     id: number,
     firstName: string,
     lastName: string,
     birthDate: string,
-    departmentCode: string,
-    departmentId: number,
-    admissionReason: string
   ) {
     const patient = this.patients.find((p) => p.id === id);
     if (patient) {
       const updatedPatient = {
         ...patient,
+        departmentId: patient.department.id,
         firstName,
         lastName,
         birthDate,
-        departmentCode,
-        departmentId,
-        admissionReason,
       };
       this.patientService.editPatient(id, updatedPatient).subscribe((updatedPatient) => {
         const index = this.patients.findIndex((p) => p.id === id);
@@ -267,8 +240,8 @@ export class ManagePatientsPage implements OnInit {
     }
   }
 
-  dischargePatient(id: number, dischargeReason: string) {
-    this.patientService.dischargePatient(id, dischargeReason).subscribe((updatedPatient) => {
+  dischargePatient(id: number, dischargeCause: string) {
+    this.patientService.dischargePatient(id, dischargeCause).subscribe((updatedPatient) => {
       const index = this.patients.findIndex((p) => p.id === id);
       if (index !== -1) {
         this.patients[index] = updatedPatient;

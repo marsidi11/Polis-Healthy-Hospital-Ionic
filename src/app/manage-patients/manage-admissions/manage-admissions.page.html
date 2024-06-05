@@ -7,7 +7,7 @@
 <ion-content>
   <!-- Display Patient Name -->
   <div *ngIf="patient" class="patient-name">
-    <!-- <h2>Patient Name: {{ patient.firstName }}</h2> -->
+    <h2>Patient Name: {{ patient.firstName }} {{ patient.lastName }}</h2>
   </div>
 
   <!-- Search Bar -->
@@ -16,14 +16,14 @@
   <!-- Departments List -->
   <ion-list>
     <ion-item *ngFor="let department of filteredDepartments">
-      <ion-label>{{ department.name }}</ion-label>
+      <ion-label>{{ department.departmentName }}</ion-label>
       <ion-button 
-        *ngIf="!currentAdmission || currentAdmission.departmentId !== department.id" 
+        *ngIf="!this.patient.department.departmentName || this.patient.department.id !== department.id" 
         (click)="openAdmitModal(department.id)">
         Admit
       </ion-button>
       <ion-button   
-        *ngIf="currentAdmission && currentAdmission.departmentId === department.id" 
+        *ngIf="this.patient.department.departmentName && this.patient.department.id === department.id" 
         color="success" disabled>
         Admitted
       </ion-button>

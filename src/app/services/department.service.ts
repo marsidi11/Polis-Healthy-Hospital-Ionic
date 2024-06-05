@@ -3,6 +3,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
+export interface Department {
+  id: number;
+  departmentCode: string;
+  departmentName: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +48,20 @@ export class DepartmentService {
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error);
+      // Log the error to the console
+      console.error(`Failed to ${operation}: ${error.message}`);
+  
+      // If the error response has a status, log that as well
+      if (error.status) {
+        console.error(`Status code: ${error.status}`);
+      }
+  
+      // If the error response has an error object, log that as well
+      if (error.error) {
+        console.error(error.error);
+      }
+  
+      // Return the provided default result
       return of(result as T);
     };
   }

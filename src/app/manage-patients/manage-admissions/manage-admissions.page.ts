@@ -1,62 +1,55 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { AdmissionService, Department, Admission } from '../../services/admission.service';
-import { PatientService } from '../../services/patient.service';
+import { PatientService, Patient } from '../../services/patient.service';
+import { DepartmentService, Department } from '../../services/department.service';
 
 @Component({
   selector: 'app-manage-admissions',
   templateUrl: './manage-admissions.page.html',
   styleUrls: ['./manage-admissions.page.scss']
 })
+
 export class ManageAdmissionsPage implements OnInit {
   patientId: number;
-  patient: undefined;
   departments: Department[] = [];
+  patient: Patient;
   filteredDepartments: Department[] = [];
-  currentAdmission: Admission | undefined;
   searchTerm: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private alertController: AlertController,
-    private admissionService: AdmissionService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private departmentService: DepartmentService,
   ) {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
+    this.patient = {} as Patient; // Initialize patient
   }
 
   ngOnInit() {
     this.getPatient();
     this.getDepartments();
-    this.getAdmission();
   }
 
   getPatient() {
-    this.patientService.getPatients().subscribe(patients => {
-      this.patient = patients.find(p => p.id === this.patientId);
+    this.patientService.getPatient(this.patientId).subscribe(patient => {
+      this.patient = patient;
     });
   }
 
   getDepartments() {
-    this.admissionService.getDepartments().subscribe(departments => {
+    this.departmentService.getDepartments().subscribe(departments => {
       this.departments = departments;
       this.filteredDepartments = departments; // Initialize filtered departments
       this.filterDepartments(); // Filter departments initially
     });
   }
 
-  getAdmission() {
-    this.admissionService.getAdmissionByPatientId(this.patientId).subscribe(admission => {
-      this.currentAdmission = admission;
-      this.filterDepartments(); // Re-filter departments after getting admission
-    });
-  }
-
   filterDepartments() {
     if (this.searchTerm) {
       this.filteredDepartments = this.departments.filter(department =>
-        department.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        department.departmentName.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     } else {
       this.filteredDepartments = this.departments;
@@ -65,12 +58,12 @@ export class ManageAdmissionsPage implements OnInit {
 
   async openAdmitModal(departmentId: number) {
     const alert = await this.alertController.create({
-      header: this.currentAdmission ? 'Transfer Patient' : 'Admit Patient',
+      header: this.patient.department.departmentName ? 'Transfer Patient' : 'Admit Patient',
       inputs: [
         {
-          name: 'cause',
+          name: 'transferReason',
           type: 'text',
-          placeholder: this.currentAdmission ? 'Cause of Transfer' : 'Cause of Admission'
+          placeholder: this.patient.department.departmentName ? 'Reason of Transfer' : 'Reason of Admission'
         }
       ],
       buttons: [
@@ -80,9 +73,9 @@ export class ManageAdmissionsPage implements OnInit {
           cssClass: 'secondary'
         },
         {
-          text: this.currentAdmission ? 'Transfer' : 'Admit',
+          text: this.patient.department.departmentName ? 'Transfer' : 'Admit',
           handler: data => {
-            this.admitPatient(departmentId, data.cause);
+            this.admitPatient(departmentId, data.transferReason);
           }
         }
       ]
@@ -91,10 +84,11 @@ export class ManageAdmissionsPage implements OnInit {
     await alert.present();
   }
 
-  admitPatient(departmentId: number, cause: string) {
-    const admission: Admission = { patientId: this.patientId, departmentId, cause };
-    this.admissionService.admitPatient(admission).subscribe(() => {
-      this.getAdmission();
+  admitPatient(departmentId: number, transferReason: string) {
+    this.patientService.admitPatient(this.patientId, departmentId, transferReason).subscribe(() => {
+      console.log(`Patient admitted to department id=${departmentId} with reason=${transferReason}`);
+    }, error => {
+      console.error(`Error admitting patient: ${error}`);
     });
   }
 }

@@ -19,9 +19,9 @@
       <ion-col>Actions</ion-col>
     </ion-row>
     <ion-row *ngFor="let patient of filteredPatients">
-      <ion-col>{{patient.firstName}} {{patient.lastName}}</ion-col>
-      <ion-col>{{patient.birthDate}}</ion-col>
-      <ion-col>{{patient.departmentCode}}</ion-col>
+      <ion-col>{{ patient.firstName }} {{ patient.lastName }}</ion-col>
+      <ion-col>{{ patient.birthDate }}</ion-col>
+      <ion-col>{{ patient?.department?.departmentName ?? 'No Department Assigned' }}</ion-col>
       <ion-col>
         <ion-button fill="clear" color="tertiary" (click)="openEditModal(patient)">Edit</ion-button>
         <ion-button fill="clear" color="danger" (click)="deletePatient(patient)">Delete</ion-button>
