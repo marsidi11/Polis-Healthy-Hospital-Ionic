@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DepartmentService, Department } from '../../services/department.service';
+import { Department } from '../../services/department.service';
+
 
 @Component({
   selector: 'app-create-patient',
@@ -35,7 +36,12 @@ export class CreatePatientModalComponent implements OnInit {
 
   submit() {
     if (this.form.valid) {
-      this.modalController.dismiss(this.form.value);
+      const formValue = this.form.value;
+      if (formValue.birthDate) {
+        const date = new Date(formValue.birthDate);
+        formValue.birthDate = date.toISOString().split('T')[0]; // convert date to ISO 8601 format
+      }
+      this.modalController.dismiss(formValue);
     }
   }
 }

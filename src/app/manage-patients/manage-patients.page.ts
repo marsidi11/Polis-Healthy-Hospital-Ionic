@@ -69,9 +69,8 @@ export class ManagePatientsPage implements OnInit {
             data.firstName,
             data.lastName,
             data.birthDate,
-            selectedDepartment.departmentCode,
             selectedDepartment.id,
-            data.admissionState.admissionReason
+            data.admissionReason
           );
         } else {
           console.error('No department selected');
@@ -86,7 +85,6 @@ export class ManagePatientsPage implements OnInit {
     firstName: string,
     lastName: string,
     birthDate: string,
-    departmentCode: string,
     departmentId: number,
     admissionReason: string
   ) {
@@ -94,15 +92,9 @@ export class ManagePatientsPage implements OnInit {
       firstName,
       lastName,
       birthDate,
-      department: {
-        id: departmentId,
-      },
-      admissionState: [
-        {
-          admissionReason,
-        },
-      ],
-    } as Patient;
+      departmentId,
+      admissionReason
+    };
     console.log(newPatient);
     this.patientService.createPatient(newPatient).subscribe((patient) => {
       this.patients.push(patient);
