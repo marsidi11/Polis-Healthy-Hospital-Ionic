@@ -58,12 +58,12 @@ export class ManageAdmissionsPage implements OnInit {
 
   async openAdmitModal(departmentId: number) {
     const alert = await this.alertController.create({
-      header: this.patient.department.departmentName ? 'Transfer Patient' : 'Admit Patient',
+      header: this.patient.department?.departmentName ? 'Transfer Patient' : 'Admit Patient',
       inputs: [
         {
           name: 'transferReason',
           type: 'text',
-          placeholder: this.patient.department.departmentName ? 'Reason of Transfer' : 'Reason of Admission'
+          placeholder: this.patient.department?.departmentName ? 'Reason of Transfer' : 'Reason of Admission'
         }
       ],
       buttons: [
@@ -73,7 +73,7 @@ export class ManageAdmissionsPage implements OnInit {
           cssClass: 'secondary'
         },
         {
-          text: this.patient.department.departmentName ? 'Transfer' : 'Admit',
+          text: this.patient.department?.departmentName ? 'Transfer' : 'Admit',
           handler: data => {
             this.admitPatient(departmentId, data.transferReason);
           }

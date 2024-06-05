@@ -18,12 +18,12 @@
     <ion-item *ngFor="let department of filteredDepartments">
       <ion-label>{{ department.departmentName }}</ion-label>
       <ion-button 
-        *ngIf="!this.patient.department.departmentName || this.patient.department.id !== department.id" 
-        (click)="openAdmitModal(department.id)">
+      *ngIf="!this.patient.department?.departmentName || this.patient.department?.id !== department.id"
+      (click)="openAdmitModal(department.id)">
         Admit
       </ion-button>
       <ion-button   
-        *ngIf="this.patient.department.departmentName && this.patient.department.id === department.id" 
+        *ngIf="this.patient.department?.departmentName && this.patient.department?.id === department.id" 
         color="success" disabled>
         Admitted
       </ion-button>
