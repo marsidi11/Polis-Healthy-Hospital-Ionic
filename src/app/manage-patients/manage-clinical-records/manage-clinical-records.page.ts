@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ClinicalRecordService } from '../../services/clinical-record.service';
+import { ClinicalRecordService, ClinicalRecord } from '../../services/clinical-record.service';
 import { AlertController } from '@ionic/angular';
-
-export interface ClinicalRecord {
-  id: number;
-  diagnosis: string;
-  medications: string[];
-  allergies: string[];
-}
 
 @Component({
   selector: 'app-manage-clinical-records',
@@ -45,7 +38,7 @@ export class ManageClinicalRecordsPage implements OnInit {
       this.filteredClinicalRecords = this.clinicalRecords;
     } else {
       this.filteredClinicalRecords = this.clinicalRecords.filter(record =>
-        record.diagnosis.toLowerCase().includes(this.searchTerm.toLowerCase())
+        record.clinicalRecord.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
   }
@@ -56,19 +49,9 @@ export class ManageClinicalRecordsPage implements OnInit {
       header: 'Add Clinical Data',
       inputs: [
         {
-          name: 'diagnosis',
+          name: 'clinicalRecord',
           type: 'text',
-          placeholder: 'Diagnosis'
-        },
-        {
-          name: 'medications',
-          type: 'text',
-          placeholder: 'Medications (comma separated)'
-        },
-        {
-          name: 'allergies',
-          type: 'text',
-          placeholder: 'Allergies (comma separated)'
+          placeholder: 'Clinical Record'
         }
       ],
       buttons: [
@@ -80,9 +63,7 @@ export class ManageClinicalRecordsPage implements OnInit {
         {
           text: 'Add',
           handler: data => {
-            const medications = data.medications.split(',').map((med: string) => med.trim());
-            const allergies = data.allergies.split(',').map((allergy: string) => allergy.trim());
-            this.addClinicalRecord(data.diagnosis, medications, allergies);
+            this.createClinicalRecord(data.clinicalRecord);
           }
         }
       ]
@@ -96,22 +77,10 @@ export class ManageClinicalRecordsPage implements OnInit {
       header: 'Edit Clinical Data',
       inputs: [
         {
-          name: 'diagnosis',
+          name: 'clinicalRecord',
           type: 'text',
-          value: record.diagnosis,
-          placeholder: 'Diagnosis'
-        },
-        {
-          name: 'medications',
-          type: 'text',
-          value: record.medications.join(', '),
-          placeholder: 'Medications (comma separated)'
-        },
-        {
-          name: 'allergies',
-          type: 'text',
-          value: record.allergies.join(', '),
-          placeholder: 'Allergies (comma separated)'
+          value: record.clinicalRecord,
+          placeholder: 'Clinical Record'
         }
       ],
       buttons: [
@@ -123,9 +92,7 @@ export class ManageClinicalRecordsPage implements OnInit {
         {
           text: 'Save',
           handler: data => {
-            const medications = data.medications.split(',').map((med: string) => med.trim());
-            const allergies = data.allergies.split(',').map((allergy: string) => allergy.trim());
-            this.editClinicalRecord(record.id, data.diagnosis, medications, allergies);
+            this.editClinicalRecord(record.id, data.clinicalRecord);
           }
         }
       ]
@@ -134,21 +101,18 @@ export class ManageClinicalRecordsPage implements OnInit {
     await alert.present();
   }
 
-  addClinicalRecord(diagnosis: string, medications: string[], allergies: string[]) {
-    const newRecord: ClinicalRecord = { id: this.clinicalRecords.length + 1, diagnosis, medications, allergies };
-    this.clinicalRecordService.addClinicalRecord(this.patientId, newRecord).subscribe((record: ClinicalRecord) => {
+  createClinicalRecord(clinicalRecord: string) {
+    this.clinicalRecordService.createClinicalRecord(this.patientId, clinicalRecord).subscribe((record: ClinicalRecord) => {
       this.clinicalRecords.push(record);
       this.filterClinicalRecords(); // Refresh the filtered list
     });
   }
 
-  editClinicalRecord(id: number, diagnosis: string, medications: string[], allergies: string[]) {
+  editClinicalRecord(id: number, clinicalRecord: string) {
     const record = this.clinicalRecords.find(r => r.id === id);
     if (record) {
-      record.diagnosis = diagnosis;
-      record.medications = medications;
-      record.allergies = allergies;
-      this.clinicalRecordService.editClinicalRecord(this.patientId, record).subscribe(() => {
+      record.clinicalRecord = clinicalRecord;
+      this.clinicalRecordService.editClinicalRecord(id, record).subscribe(() => {
         this.filterClinicalRecords(); // Refresh the filtered list
       });
     }
@@ -157,7 +121,7 @@ export class ManageClinicalRecordsPage implements OnInit {
   async deleteClinicalRecord(record: ClinicalRecord) {
     const alert = await this.alertController.create({
       header: 'Confirm Delete',
-      message: `Are you sure you want to delete the clinical record with diagnosis ${record.diagnosis}?`,
+      message: `Are you sure you want to delete the clinical record with diagnosis ${record.clinicalRecord}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -167,7 +131,7 @@ export class ManageClinicalRecordsPage implements OnInit {
         {
           text: 'Delete',
           handler: () => {
-            this.clinicalRecordService.deleteClinicalRecord(this.patientId, record.id).subscribe(() => {
+            this.clinicalRecordService.deleteClinicalRecord(record.id).subscribe(() => {
               this.clinicalRecords = this.clinicalRecords.filter(r => r.id !== record.id);
               this.filterClinicalRecords(); // Refresh the filtered list
             });

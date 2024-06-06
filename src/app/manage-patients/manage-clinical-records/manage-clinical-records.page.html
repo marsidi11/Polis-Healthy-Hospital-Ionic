@@ -6,36 +6,30 @@
 
 <ion-content>
   <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterClinicalRecords()" placeholder="Search Clinical Data"></ion-searchbar>
-  <ion-button expand="full" color="primary" (click)="openCreateModal()">Add New Clinical Data</ion-button>
-  
-  <ion-card *ngFor="let record of filteredClinicalRecords">
-    <ion-card-header>
-      <ion-card-title>Diagnose: {{ record.diagnosis }}</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-item>
-        <ion-label>
-          <h2>Medications</h2>
-          <p>{{ record.medications.join(', ') }}</p>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>
-          <h2>Allergies</h2>
-          <p>{{ record.allergies.join(', ') }}</p>
-        </ion-label>
-      </ion-item>
-      <ion-button expand="full" color="secondary" (click)="openEditModal(record)">Edit</ion-button>
-      <ion-button expand="full" color="danger" (click)="deleteClinicalRecord(record)">Delete</ion-button>
-    </ion-card-content>
-  </ion-card>
+  <ion-button expand="block" (click)="openCreateModal()">Add New Clinical Data</ion-button>
+
+  <ion-grid *ngIf="filteredClinicalRecords && filteredClinicalRecords.length > 0">
+    <ion-row class="header">
+      <ion-col>#</ion-col>
+      <ion-col>Diagnosis</ion-col>
+      <ion-col>Actions</ion-col>
+    </ion-row>
+    <ion-row *ngFor="let record of filteredClinicalRecords; let i = index">
+      <ion-col>{{ i + 1 }}</ion-col>
+      <ion-col>{{ record.clinicalRecord }}</ion-col>
+      <ion-col>
+        <ion-button (click)="openEditModal(record)">Edit</ion-button>
+        <ion-button color="danger" (click)="deleteClinicalRecord(record)">Delete</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <ion-card *ngIf="filteredClinicalRecords && filteredClinicalRecords.length === 0">
     <ion-card-header>
       <ion-card-title>No Clinical Records Found</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <p>No clinical records available for the specified patient.</p>
+      <p>No clinical records available.</p>
     </ion-card-content>
   </ion-card>
 </ion-content>

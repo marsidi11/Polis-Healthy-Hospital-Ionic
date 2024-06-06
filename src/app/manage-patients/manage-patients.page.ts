@@ -189,8 +189,8 @@ export class ManagePatientsPage implements OnInit {
               this.patientService.dischargePatient(patient.id, data).subscribe({
                 next: (dischargedPatient) => {
                   // Handle the successfully discharged patient.
-                  patient.department = { ...patient.department, departmentName: 'No Department Assigned' };
-                  patient.admissionState = patient.admissionState.map(state => ({ ...state, discharged: true }));                
+                  patient.department = null; // Set department to null
+                  patient.admissionState = patient.admissionState.map(state => ({ ...state, discharged: true }));
                 },
                 error: (err) => {
                   // Handle the error scenario.
@@ -217,7 +217,7 @@ export class ManagePatientsPage implements OnInit {
     if (patient) {
       const updatedPatient = {
         ...patient,
-        departmentId: patient.department.id,
+        departmentId: patient.department?.id,
         firstName,
         lastName,
         birthDate,

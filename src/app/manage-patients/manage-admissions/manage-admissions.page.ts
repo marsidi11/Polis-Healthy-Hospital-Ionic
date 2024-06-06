@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { PatientService, Patient } from '../../services/patient.service';
 import { DepartmentService, Department } from '../../services/department.service';
+import { last } from 'rxjs';
 
 @Component({
   selector: 'app-manage-admissions',
@@ -24,7 +25,14 @@ export class ManageAdmissionsPage implements OnInit {
     private departmentService: DepartmentService,
   ) {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
-    this.patient = {} as Patient; // Initialize patient
+  this.patient = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    birthDate: '',
+    department: null,
+    admissionState: []
+  };
   }
 
   ngOnInit() {
@@ -57,13 +65,14 @@ export class ManageAdmissionsPage implements OnInit {
   }
 
   async openAdmitModal(departmentId: number) {
+    const hasDepartment = this.patient.department && this.patient.department.departmentName;
     const alert = await this.alertController.create({
-      header: this.patient.department?.departmentName ? 'Transfer Patient' : 'Admit Patient',
+      header: hasDepartment ? 'Transfer Patient' : 'Admit Patient',
       inputs: [
         {
           name: 'transferReason',
           type: 'text',
-          placeholder: this.patient.department?.departmentName ? 'Reason of Transfer' : 'Reason of Admission'
+          placeholder: hasDepartment ? 'Reason of Transfer' : 'Reason of Admission'
         }
       ],
       buttons: [
@@ -73,19 +82,33 @@ export class ManageAdmissionsPage implements OnInit {
           cssClass: 'secondary'
         },
         {
-          text: this.patient.department?.departmentName ? 'Transfer' : 'Admit',
+          text: hasDepartment ? 'Transfer' : 'Admit',
           handler: data => {
-            this.admitPatient(departmentId, data.transferReason);
+            this.admitPatient(
+              departmentId, 
+              data.transferReason, 
+              this.patient.firstName, 
+              this.patient.lastName, 
+              this.patient.birthDate
+            );
           }
         }
       ]
     });
-
+  
     await alert.present();
   }
-
-  admitPatient(departmentId: number, transferReason: string) {
-    this.patientService.admitPatient(this.patientId, departmentId, transferReason).subscribe(() => {
+  
+  admitPatient(departmentId: number, transferReason: string, firstName: string, lastName: string, birthDate: string) {
+    const patientData = {
+      firstName,
+      lastName,
+      birthDate,
+      departmentId,
+      transferReason
+    }
+    console.log('Admitting patient:', patientData);
+    this.patientService.admitPatient(this.patientId, patientData).subscribe(() => {
       console.log(`Patient admitted to department id=${departmentId} with reason=${transferReason}`);
     }, error => {
       console.error(`Error admitting patient: ${error}`);

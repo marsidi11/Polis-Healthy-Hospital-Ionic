@@ -12,7 +12,7 @@ export interface Patient {
     departmentCode: string;
     departmentName: string;
     id: number;
-  };
+  } | null;
   admissionState: {
     id: number;
     admissionReason: string;
@@ -89,14 +89,13 @@ export class PatientService {
     );
   }
 
-  admitPatient(patientId: number, departmentId: number, transferReason: string): Observable<any> {
+  admitPatient(patientId: number, patient: any): Observable<any> {
     const url = `${this.dataUrl}/${patientId}`;
-    const updateData = { departmentId, transferReason };
-    return this.http.put<any>(url, updateData).pipe(
+    return this.http.put<any>(url, patient).pipe(
       tap(_ => console.log(`updated patient id=${patientId}`)),
       catchError(this.handleError<any>('admitPatient'))
     );
-}
+  }
 
   request(method: string, url: string, body?: any): Observable<any> {
     return this.http.request<any>(method, url, { body }).pipe(
