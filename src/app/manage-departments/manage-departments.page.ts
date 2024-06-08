@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DepartmentService } from '../services/department.service';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, ToastController } from '@ionic/angular';
 
 export interface Department {
   id: number;
@@ -21,19 +21,57 @@ export class ManageDepartmentsPage implements OnInit {
   constructor(
     private departmentService: DepartmentService,
     private alertController: AlertController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
     this.getDepartments();
   }
 
-  getDepartments(): void {
-    this.departmentService.getDepartments().subscribe(departments => {
-      this.departments = departments;
-      this.filteredDepartments = departments;
-      console.log('Departments:', departments);
+  async presentSuccessToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-success',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
     });
+    toast.present();
+  }
+
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-error',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
+  getDepartments(): void {
+    this.departmentService.getDepartments().subscribe(
+      departments => {
+        this.departments = departments;
+        this.filteredDepartments = departments;
+        console.log('Departments:', departments);
+      },
+      error => {
+        this.presentErrorToast(error);
+      }
+    );
   }
 
   filterDepartments() {
@@ -116,10 +154,16 @@ export class ManageDepartmentsPage implements OnInit {
 
   createDepartment(departmentCode: string, departmentName: string) {
     const newDepartment = { departmentCode, departmentName } as Department;
-    this.departmentService.createDepartment(newDepartment).subscribe(department => {
-      this.departments.push(department);
-      this.filterDepartments(); // Refresh the filtered list
-    });
+    this.departmentService.createDepartment(newDepartment).subscribe(
+      department => {
+        this.departments.push(department);
+        this.filterDepartments(); // Refresh the filtered list
+        this.presentSuccessToast('Department created successfully.');
+      },
+      error => {
+        this.presentErrorToast(error);
+      }
+    );
   }
 
   editDepartment(id: number, departmentName: string, departmentCode: string) {
@@ -127,14 +171,20 @@ export class ManageDepartmentsPage implements OnInit {
     if (department) {
       department.departmentName = departmentName;
       department.departmentCode = departmentCode;
-      this.departmentService.editDepartment(id, department).subscribe(updatedDepartment => {
-        // Update the local department with the updated details
-        const index = this.departments.findIndex(dep => dep.id === id);
-        if (index !== -1) {
-          this.departments[index] = updatedDepartment;
-          this.filterDepartments(); // Refresh the filtered list
+      this.departmentService.editDepartment(id, department).subscribe(
+        updatedDepartment => {
+          // Update the local department with the updated details
+          const index = this.departments.findIndex(dep => dep.id === id);
+          if (index !== -1) {
+            this.departments[index] = updatedDepartment;
+            this.filterDepartments(); // Refresh the filtered list
+            this.presentSuccessToast('Department updated successfully.');
+          }
+        },
+        error => {
+          this.presentErrorToast(error);
         }
-      });
+      );
     }
   }
 
@@ -151,10 +201,16 @@ export class ManageDepartmentsPage implements OnInit {
         {
           text: 'Delete',
           handler: () => {
-            this.departmentService.deleteDepartment(id).subscribe(() => {
-              this.departments = this.departments.filter(dep => dep.id !== id);
-              this.filterDepartments(); // Refresh the filtered list
-            });
+            this.departmentService.deleteDepartment(id).subscribe(
+              () => {
+                this.departments = this.departments.filter(dep => dep.id !== id);
+                this.filterDepartments(); // Refresh the filtered list
+                this.presentSuccessToast('Department deleted successfully.');
+              },
+              error => {
+                this.presentErrorToast(error);
+              }
+            );
           }
         }
       ]

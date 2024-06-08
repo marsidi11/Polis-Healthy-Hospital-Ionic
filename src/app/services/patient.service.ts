@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 export interface Patient {
@@ -105,22 +105,12 @@ export class PatientService {
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      // Log the error to the console
-      console.error(`Failed to ${operation}: ${error.message}`);
-  
-      // If the error response has a status, log that as well
-      if (error.status) {
-        console.error(`Status code: ${error.status}`);
-      }
-  
-      // If the error response has an error object, log that as well
+    return (error: HttpErrorResponse): Observable<T> => {
+      let errorMessage = `Failed to ${operation}: ${error.message}`;
       if (error.error) {
-        console.error(error.error);
+        errorMessage = `${error.error.message || errorMessage}`;
       }
-  
-      // Return the provided default result
-      return of(result as T);
+      return throwError(errorMessage);
     };
   }
 }

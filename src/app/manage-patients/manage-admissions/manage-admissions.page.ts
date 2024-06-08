@@ -25,14 +25,14 @@ export class ManageAdmissionsPage implements OnInit {
     private departmentService: DepartmentService,
   ) {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
-  this.patient = {
-    id: 0,
-    firstName: '',
-    lastName: '',
-    birthDate: '',
-    department: null,
-    admissionState: []
-  };
+    this.patient = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      birthDate: '',
+      department: null,
+      admissionState: []
+    };
   }
 
   ngOnInit() {
@@ -43,6 +43,7 @@ export class ManageAdmissionsPage implements OnInit {
   getPatient() {
     this.patientService.getPatient(this.patientId).subscribe(patient => {
       this.patient = patient;
+      console.log(this.patient);
     });
   }
 
@@ -107,9 +108,19 @@ export class ManageAdmissionsPage implements OnInit {
       departmentId,
       transferReason
     }
-    console.log('Admitting patient:', patientData);
+    
     this.patientService.admitPatient(this.patientId, patientData).subscribe(() => {
-      console.log(`Patient admitted to department id=${departmentId} with reason=${transferReason}`);
+      
+      const department = this.departments.find(dep => dep.id === departmentId);
+
+      // Update local patient state
+      if (department) {
+        this.patient.department = {
+          id: department.id,
+          departmentCode: department.departmentCode,
+          departmentName: department.departmentName
+        };
+      }
     }, error => {
       console.error(`Error admitting patient: ${error}`);
     });

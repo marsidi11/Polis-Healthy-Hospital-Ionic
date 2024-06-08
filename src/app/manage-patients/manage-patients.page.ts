@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService, Patient } from '../services/patient.service';
 import { DepartmentService, Department } from '../services/department.service';
-import { AlertController, ModalController, NavController } from '@ionic/angular'; // Import NavController
+import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular'; // Import NavController
 import { CreatePatientModalComponent } from './create-patient/create-patient.component';
 
 @Component({
@@ -20,12 +20,45 @@ export class ManagePatientsPage implements OnInit {
     private departmentService: DepartmentService,
     private alertController: AlertController,
     private modalController: ModalController,
+    private toastController: ToastController,
     private navCtrl: NavController 
   ) {}
 
   ngOnInit() {
     this.getPatients();
     this.getDepartments();
+  }
+
+  async presentSuccessToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-success',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-error',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
   }
 
   getPatients(): void {
@@ -96,10 +129,16 @@ export class ManagePatientsPage implements OnInit {
       admissionReason
     };
     console.log(newPatient);
-    this.patientService.createPatient(newPatient).subscribe((patient) => {
+    this.patientService.createPatient(newPatient).subscribe(
+      patient => {
       this.patients.push(patient);
       this.filterPatients(); // Refresh the filtered list
-    });
+      this.presentSuccessToast('Patient created successfully');
+    },
+    (error) => {
+      this.presentErrorToast(error);
+    }
+  );
   }
 
   async openEditModal(patient: Patient) {
@@ -146,13 +185,7 @@ export class ManagePatientsPage implements OnInit {
   async openDischargeModal(patient: Patient) {
     // Check if the patient is already discharged
     if (patient.admissionState.some(state => state.discharged)) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'The patient is already discharged.',
-        buttons: ['OK'],
-      });
-  
-      await alert.present();
+      this.presentErrorToast('Patient is already discharged.');
     } else {
       const alert = await this.alertController.create({
         header: 'Discharge Patient',
@@ -191,10 +224,10 @@ export class ManagePatientsPage implements OnInit {
                   // Handle the successfully discharged patient.
                   patient.department = null; // Set department to null
                   patient.admissionState = patient.admissionState.map(state => ({ ...state, discharged: true }));
+                  this.presentSuccessToast('Patient discharged successfully.');
                 },
                 error: (err) => {
-                  // Handle the error scenario.
-                  // patient.error = 'An error occurred while discharging the patient.';
+                  this.presentErrorToast(err);
                 }
               });
             },
@@ -227,6 +260,7 @@ export class ManagePatientsPage implements OnInit {
         if (index !== -1) {
           this.patients[index] = updatedPatient;
           this.filterPatients();
+          this.presentSuccessToast('Patient updated successfully.');
         }
       });
     }
@@ -258,6 +292,7 @@ export class ManagePatientsPage implements OnInit {
             this.patientService.deletePatient(patient.id).subscribe(() => {
               this.patients = this.patients.filter((p) => p.id !== patient.id);
               this.filterPatients();
+              this.presentSuccessToast('Patient deleted successfully.');
             });
           },
         },

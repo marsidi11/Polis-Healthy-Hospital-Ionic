@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ClinicalRecordService, ClinicalRecord } from '../../services/clinical-record.service';
+import { PatientService, Patient } from '../../services/patient.service';
 import { AlertController } from '@ionic/angular';
 
 @Component({
@@ -12,26 +13,37 @@ export class ManageClinicalRecordsPage implements OnInit {
   patientId!: number;
   clinicalRecords: ClinicalRecord[] = [];
   filteredClinicalRecords: ClinicalRecord[] = [];
+  patient: Patient;
   searchTerm: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private clinicalRecordService: ClinicalRecordService,
-    private alertController: AlertController
-  ) {}
+    private patientService: PatientService,
+    private alertController: AlertController,
+  ) {
+    this.patient = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      birthDate: '',
+      department: null,
+      admissionState: []
+    };
+  }
 
   ngOnInit() {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
     this.getClinicalRecords();
+    this.getPatient();
   }
 
   getClinicalRecords(): void {
-  this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe((clinicalRecords: ClinicalRecord[]) => {
-    this.clinicalRecords = clinicalRecords;
-    this.filteredClinicalRecords = this.clinicalRecords;
-    console.log(this.filteredClinicalRecords)
-  });
-}
+    this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe((clinicalRecords: ClinicalRecord[]) => {
+      this.clinicalRecords = clinicalRecords;
+      this.filteredClinicalRecords = this.clinicalRecords;
+    });
+  }
 
   filterClinicalRecords() {
     if (this.searchTerm.trim() === '') {
@@ -42,8 +54,13 @@ export class ManageClinicalRecordsPage implements OnInit {
       );
     }
   }
-  
 
+  getPatient() {
+    this.patientService.getPatient(this.patientId).subscribe(patient => {
+      this.patient = patient;
+    });
+  }
+  
   async openCreateModal() {
     const alert = await this.alertController.create({
       header: 'Add Clinical Data',
