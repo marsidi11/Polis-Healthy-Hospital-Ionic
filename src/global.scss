@@ -64,3 +64,17 @@ ion-header {
     --color: $dark-color;
   }
 }
+
+.toast-success {
+  --background: #28a745;
+  color: #fff; 
+}
+
+.toast-error {
+  --background: #dc3545; 
+  color: #fff;
+}
+
+.invalid {
+  border: 2px solid red;
+}

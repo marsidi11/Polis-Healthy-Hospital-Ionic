@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ClinicalRecordService, ClinicalRecord } from '../../services/clinical-record.service';
-import { AlertController } from '@ionic/angular';
+import { PatientService, Patient } from '../../services/patient.service';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-manage-clinical-records',
@@ -12,26 +13,70 @@ export class ManageClinicalRecordsPage implements OnInit {
   patientId!: number;
   clinicalRecords: ClinicalRecord[] = [];
   filteredClinicalRecords: ClinicalRecord[] = [];
+  patient: Patient;
   searchTerm: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private clinicalRecordService: ClinicalRecordService,
-    private alertController: AlertController
-  ) {}
+    private patientService: PatientService,
+    private alertController: AlertController,
+    private toastController: ToastController,
+  ) {
+    this.patient = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      birthDate: '',
+      department: null,
+      admissionState: []
+    };
+  }
 
   ngOnInit() {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
     this.getClinicalRecords();
+    this.getPatient();
+  }
+
+  async presentSuccessToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-success',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-error',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
   }
 
   getClinicalRecords(): void {
-  this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe((clinicalRecords: ClinicalRecord[]) => {
-    this.clinicalRecords = clinicalRecords;
-    this.filteredClinicalRecords = this.clinicalRecords;
-    console.log(this.filteredClinicalRecords)
-  });
-}
+    this.clinicalRecordService.getClinicalRecords(this.patientId).subscribe((clinicalRecords: ClinicalRecord[]) => {
+      this.clinicalRecords = clinicalRecords;
+      this.filteredClinicalRecords = this.clinicalRecords;
+    });
+  }
 
   filterClinicalRecords() {
     if (this.searchTerm.trim() === '') {
@@ -42,8 +87,13 @@ export class ManageClinicalRecordsPage implements OnInit {
       );
     }
   }
-  
 
+  getPatient() {
+    this.patientService.getPatient(this.patientId).subscribe(patient => {
+      this.patient = patient;
+    });
+  }
+  
   async openCreateModal() {
     const alert = await this.alertController.create({
       header: 'Add Clinical Data',
@@ -63,7 +113,12 @@ export class ManageClinicalRecordsPage implements OnInit {
         {
           text: 'Add',
           handler: data => {
+            if (!data.clinicalRecord) {
+              this.presentErrorToast('All fields are required.');
+              return false;
+            }
             this.createClinicalRecord(data.clinicalRecord);
+            return true;
           }
         }
       ]
@@ -92,7 +147,12 @@ export class ManageClinicalRecordsPage implements OnInit {
         {
           text: 'Save',
           handler: data => {
+            if (!data.clinicalRecord) {
+              this.presentErrorToast('All fields are required.');
+              return false;
+            }
             this.editClinicalRecord(record.id, data.clinicalRecord);
+            return true;
           }
         }
       ]
@@ -105,6 +165,7 @@ export class ManageClinicalRecordsPage implements OnInit {
     this.clinicalRecordService.createClinicalRecord(this.patientId, clinicalRecord).subscribe((record: ClinicalRecord) => {
       this.clinicalRecords.push(record);
       this.filterClinicalRecords(); // Refresh the filtered list
+      this.presentSuccessToast('Clinical record added successfully.');
     });
   }
 
@@ -114,6 +175,7 @@ export class ManageClinicalRecordsPage implements OnInit {
       record.clinicalRecord = clinicalRecord;
       this.clinicalRecordService.editClinicalRecord(id, record).subscribe(() => {
         this.filterClinicalRecords(); // Refresh the filtered list
+        this.presentSuccessToast('Clinical record updated successfully.');
       });
     }
   }
@@ -134,6 +196,7 @@ export class ManageClinicalRecordsPage implements OnInit {
             this.clinicalRecordService.deleteClinicalRecord(record.id).subscribe(() => {
               this.clinicalRecords = this.clinicalRecords.filter(r => r.id !== record.id);
               this.filterClinicalRecords(); // Refresh the filtered list
+              this.presentSuccessToast('Clinical record deleted successfully.');
             });
           }
         }

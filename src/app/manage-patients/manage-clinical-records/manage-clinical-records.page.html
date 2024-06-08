@@ -5,6 +5,12 @@
 </ion-header>
 
 <ion-content>
+
+  <!-- Display Patient Name -->
+  <div *ngIf="patient" class="patient-name">
+    <h2>Patient Name: {{ patient.firstName }} {{ patient.lastName }}</h2>
+  </div>
+
   <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterClinicalRecords()" placeholder="Search Clinical Data"></ion-searchbar>
   <ion-button expand="block" (click)="openCreateModal()">Add New Clinical Data</ion-button>
 
@@ -26,10 +32,7 @@
 
   <ion-card *ngIf="filteredClinicalRecords && filteredClinicalRecords.length === 0">
     <ion-card-header>
-      <ion-card-title>No Clinical Records Found</ion-card-title>
+      <ion-card-title>No Clinical Records Available</ion-card-title>
     </ion-card-header>
-    <ion-card-content>
-      <p>No clinical records available.</p>
-    </ion-card-content>
   </ion-card>
 </ion-content>

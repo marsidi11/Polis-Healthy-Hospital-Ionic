@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular'; 
 import { PatientService, Patient } from '../../services/patient.service';
 import { DepartmentService, Department } from '../../services/department.service';
-import { last } from 'rxjs';
 
 @Component({
   selector: 'app-manage-admissions',
@@ -23,16 +22,18 @@ export class ManageAdmissionsPage implements OnInit {
     private alertController: AlertController,
     private patientService: PatientService,
     private departmentService: DepartmentService,
+    private toastController: ToastController,
+
   ) {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
-  this.patient = {
-    id: 0,
-    firstName: '',
-    lastName: '',
-    birthDate: '',
-    department: null,
-    admissionState: []
-  };
+    this.patient = {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      birthDate: '',
+      department: null,
+      admissionState: []
+    };
   }
 
   ngOnInit() {
@@ -40,9 +41,42 @@ export class ManageAdmissionsPage implements OnInit {
     this.getDepartments();
   }
 
+  async presentSuccessToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-success',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-error',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
   getPatient() {
     this.patientService.getPatient(this.patientId).subscribe(patient => {
       this.patient = patient;
+      console.log(this.patient);
     });
   }
 
@@ -84,6 +118,11 @@ export class ManageAdmissionsPage implements OnInit {
         {
           text: hasDepartment ? 'Transfer' : 'Admit',
           handler: data => {
+            if (!data.transferReason || data.transferReason.trim() === '') {
+              this.presentErrorToast('Reason of Transfer/Admission is required.');
+              return false; // Prevents the modal from closing
+            }
+  
             this.admitPatient(
               departmentId, 
               data.transferReason, 
@@ -91,6 +130,8 @@ export class ManageAdmissionsPage implements OnInit {
               this.patient.lastName, 
               this.patient.birthDate
             );
+  
+            return true; // Prevents the modal from closing immediately
           }
         }
       ]
@@ -106,12 +147,26 @@ export class ManageAdmissionsPage implements OnInit {
       birthDate,
       departmentId,
       transferReason
-    }
-    console.log('Admitting patient:', patientData);
+    };
+  
     this.patientService.admitPatient(this.patientId, patientData).subscribe(() => {
-      console.log(`Patient admitted to department id=${departmentId} with reason=${transferReason}`);
+      const department = this.departments.find(dep => dep.id === departmentId);
+  
+      // Update local patient state
+      if (department) {
+        this.patient.department = {
+          id: department.id,
+          departmentCode: department.departmentCode,
+          departmentName: department.departmentName
+        };
+      }
+  
+      // Show success toast
+      this.presentSuccessToast('Patient successfully admitted/transferred.');
     }, error => {
       console.error(`Error admitting patient: ${error}`);
+      // Show error toast
+      this.presentErrorToast(error.message || 'An error occurred.');
     });
   }
 }

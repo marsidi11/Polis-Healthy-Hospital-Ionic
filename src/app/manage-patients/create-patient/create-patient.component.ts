@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Department } from '../../services/department.service';
-
 
 @Component({
   selector: 'app-create-patient',
@@ -15,7 +14,8 @@ export class CreatePatientModalComponent implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastController: ToastController
   ) {
     this.form = this.fb.group({
       departmentId: [null, Validators.required],
@@ -34,6 +34,22 @@ export class CreatePatientModalComponent implements OnInit {
     this.modalController.dismiss();
   }
 
+  async presentErrorToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'toast-error',
+      buttons: [
+        {
+          text: 'Dismiss',
+          role: 'cancel'
+        }
+      ]
+    });
+    toast.present();
+  }
+
   submit() {
     if (this.form.valid) {
       const formValue = this.form.value;
@@ -42,6 +58,8 @@ export class CreatePatientModalComponent implements OnInit {
         formValue.birthDate = date.toISOString().split('T')[0]; // convert date to ISO 8601 format
       }
       this.modalController.dismiss(formValue);
+    } else {
+      this.presentErrorToast('All fields are required.');
     }
   }
 }
