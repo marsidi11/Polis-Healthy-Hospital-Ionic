@@ -24,8 +24,12 @@
       <ion-col>{{ department.departmentCode }}</ion-col>
       <ion-col>{{ department.departmentName }}</ion-col>
       <ion-col class="actions-col">
-        <ion-button fill="clear" color="tertiary" (click)="openEditModal(department)"  class="action-button">Edit</ion-button>
-        <ion-button fill="clear" color="danger" (click)="deleteDepartment(department.id,department)" class="action-button">Delete</ion-button>
+        <ion-button fill="clear" color="tertiary" (click)="openEditModal(department)" class="action-button">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="deleteDepartment(department.id,department)" class="action-button">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
