@@ -54,7 +54,9 @@ export class DepartmentService {
         // Use only the 'errorMsg' from the server response
         errorMessage = error.error.errorMsg;
       }
-      return throwError(errorMessage);
+  
+      // Return the provided default result
+      return of(result as T);
     };
   }
 }

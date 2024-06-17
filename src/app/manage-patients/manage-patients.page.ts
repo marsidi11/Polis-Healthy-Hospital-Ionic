@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService, Patient } from '../services/patient.service';
 import { DepartmentService, Department } from '../services/department.service';
-import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular';
+import { AlertController, ModalController, NavController } from '@ionic/angular'; // Import NavController
 import { CreatePatientModalComponent } from './create-patient/create-patient.component';
 
 @Component({
@@ -195,8 +195,14 @@ export class ManagePatientsPage implements OnInit {
 
   async openDischargeModal(patient: Patient) {
     // Check if the patient is already discharged
-    if (patient.department === null) {
-      this.presentErrorToast('Patient is already discharged.');
+    if (patient.admissionState.some(state => state.discharged)) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'The patient is already discharged.',
+        buttons: ['OK'],
+      });
+  
+      await alert.present();
     } else {
       const alert = await this.alertController.create({
         header: 'Discharge Patient',
