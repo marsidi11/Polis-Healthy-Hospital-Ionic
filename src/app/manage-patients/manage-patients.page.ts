@@ -195,7 +195,7 @@ export class ManagePatientsPage implements OnInit {
 
   async openDischargeModal(patient: Patient) {
     // Check if the patient is already discharged
-    if (patient.admissionState.some(state => state.discharged)) {
+    if (patient.department === null) {
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'The patient is already discharged.',
