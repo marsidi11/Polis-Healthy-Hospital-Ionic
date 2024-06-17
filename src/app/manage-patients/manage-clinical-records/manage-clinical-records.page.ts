@@ -2,11 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ClinicalRecordService, ClinicalRecord } from '../../services/clinical-record.service';
 import { PatientService, Patient } from '../../services/patient.service';
-<<<<<<< HEAD
 import { AlertController, ToastController } from '@ionic/angular';
-=======
-import { AlertController } from '@ionic/angular';
->>>>>>> 98a1827e841da17a1aa68f2c94fd1bcf4e6f11a7
 
 @Component({
   selector: 'app-manage-clinical-records',
@@ -25,10 +21,7 @@ export class ManageClinicalRecordsPage implements OnInit {
     private clinicalRecordService: ClinicalRecordService,
     private patientService: PatientService,
     private alertController: AlertController,
-<<<<<<< HEAD
     private toastController: ToastController,
-=======
->>>>>>> 98a1827e841da17a1aa68f2c94fd1bcf4e6f11a7
   ) {
     this.patient = {
       id: 0,
@@ -44,7 +37,6 @@ export class ManageClinicalRecordsPage implements OnInit {
     this.patientId = +this.route.snapshot.paramMap.get('patientId')!;
     this.getClinicalRecords();
     this.getPatient();
-<<<<<<< HEAD
   }
 
   async presentSuccessToast(message: string) {
@@ -76,9 +68,7 @@ export class ManageClinicalRecordsPage implements OnInit {
         }
       ]
     });
-    toast.present();
-=======
->>>>>>> 98a1827e841da17a1aa68f2c94fd1bcf4e6f11a7
+    toast.present();  
   }
 
   getClinicalRecords(): void {

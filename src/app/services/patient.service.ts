@@ -105,18 +105,12 @@ export class PatientService {
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      // Log the error to the console
-      console.error(`Failed to ${operation}: ${error.message}`);
-  
-      // If the error response has a status, log that as well
-      if (error.status) {
-        console.error(`Status code: ${error.status}`);
-      }
-  
-      // If the error response has an error object, log that as well
-      if (error.error) {
-        console.error(error.error);
+    return (error: HttpErrorResponse): Observable<T> => {
+      // Default error message in case 'errorMsg' is not available in the response
+      let errorMessage = `Failed to ${operation}: ${error.message}`;
+      if (error.error && typeof error.error === 'object' && 'errorMsg' in error.error) {
+        // Use only the 'errorMsg' from the server response
+        errorMessage = error.error.errorMsg;
       }
       return throwError(errorMessage);
     };

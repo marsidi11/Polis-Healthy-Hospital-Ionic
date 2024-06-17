@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PatientService, Patient } from '../services/patient.service';
 import { DepartmentService, Department } from '../services/department.service';
-import { AlertController, ModalController, NavController } from '@ionic/angular'; // Import NavController
+import { AlertController, ModalController, NavController, ToastController } from '@ionic/angular'; // Import NavController
 import { CreatePatientModalComponent } from './create-patient/create-patient.component';
 
 @Component({
