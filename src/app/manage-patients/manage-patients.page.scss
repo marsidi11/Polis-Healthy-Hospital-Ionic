@@ -39,7 +39,6 @@ ion-searchbar {
   --border-radius: 50px;
   --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   margin: 20px 10px;
-  max-width: 600px;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
@@ -116,12 +115,6 @@ ion-grid {
   ion-col {
     padding: 15px 5px;
     text-align: center;
-
-    &:nth-child(1) { width: 10%; }
-    &:nth-child(2) { width: 25%; }
-    &:nth-child(3) { width: 10%; }
-    &:nth-child(4) { width: 20%; }
-    &:nth-child(5) { width: 35%; }
   }
 }
 
@@ -136,16 +129,15 @@ ion-row:not(.header) {
     color: $dark-color;
     font-size: 0.9rem;
 
-    &:nth-child(2), &:nth-child(4) {
-      text-align: left;
+    &:nth-child(1), &:nth-child(3) {
       padding-left: 10px;
     }
 
-    &:nth-child(2) {
+    &:nth-child(1) {
       font-weight: 500;
     }
 
-    &:nth-child(4) {
+    &:nth-child(3) {
       font-style: italic;
       color: $secondary-color;
     }
@@ -153,7 +145,7 @@ ion-row:not(.header) {
 
   &:hover {
     background-color: rgba($accent-color, 0.1);
-    ion-col:nth-child(4) {
+    ion-col:nth-child(3) {
       font-weight: 500;
       color: $accent-color;
     }
@@ -161,20 +153,54 @@ ion-row:not(.header) {
 }
 
 // Action Button Styles
-ion-row:not(.header) ion-col:last-child {
+.actions-col {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   gap: 5px;
+
+  .icon-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .action-button {
+    --border-radius: 50%;
+    --padding-start: 0;
+    --padding-end: 0;
+    --color: $primary-color;
+    --color-activated: $secondary-color;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    transition: opacity 0.3s, transform 0.3s;
+
+    &[color="danger"] {
+      --color: #E57373;
+      --color-activated: #EF5350;
+    }
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    ion-icon {
+      font-size: 1rem;
+    }
+  }
 
   ion-button {
     --border-radius: 5px;
     --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 0.8rem;
     height: 2.5em;
-    flex: 1 0 calc(50% - 5px);
-    max-width: calc(50% - 5px);
+    width: 100%;
+    max-width: 200px;
 
     &:not([expand]) {
       --padding-start: 0.5em;
@@ -187,6 +213,12 @@ ion-row:not(.header) ion-col:last-child {
     &[color="danger"] {
       --background: #E57373;
       --background-hover: #EF5350;
+    }
+
+    &[color="warning"] {
+      --background: #FFA000;
+      --background-hover: #FF8F00;
+      --color: $light-color;
     }
 
     &[expand] {
@@ -222,6 +254,54 @@ ion-grid:empty {
 }
 
 // Media Queries
+@media (max-width: 767px) {
+  ion-grid {
+    margin: 10px;
+  }
+
+  .header {
+    ion-col {
+      &:nth-child(1) { width: 35%; }
+      &:nth-child(2) { width: 25%; }
+      &:nth-child(3) { width: 25%; }
+      &:nth-child(4) { display: none; }
+    }
+  }
+
+  ion-row:not(.header) {
+    ion-col {
+      &:nth-child(3) {
+        display: block;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+      }
+    }
+  }
+
+  .actions-col {
+    flex-direction: row;
+    justify-content: space-between;
+
+    .icon-buttons {
+      order: 2;
+    }
+
+    ion-button {
+      max-width: unset;
+      width: auto;
+      flex-grow: 1;
+
+      &[expand] {
+        font-size: 0.8rem;
+        margin-top: 0;
+      }
+    }
+  }
+}
+
 @media (min-width: 768px) {
   ion-searchbar, ion-button[expand="block"] {
     max-width: 500px;
@@ -230,14 +310,6 @@ ion-grid:empty {
   ion-grid {
     margin: 30px auto;
     max-width: 900px;
-  }
-
-  ion-row:not(.header) ion-col:last-child ion-button {
-    font-size: 0.85rem;
-
-    &[expand] {
-      font-size: 0.8rem;
-    }
   }
 }
 
